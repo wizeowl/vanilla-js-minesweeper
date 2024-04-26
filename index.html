@@ -4,18 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css?family=Space+Mono:400,700" rel="stylesheet">
-  <title>Classic Minesweeper Grid</title>
+  <title>Classic Minesweeper</title>
   <link rel="stylesheet" href="style.css">
   <script src="lib.js"></script>
   <script src="script.js"></script>
   <script src="counters.js"></script>
   <script src="highlighter.js"></script>
   <script src="statistics.js"></script>
+  <script src="controls.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<div class="main-container">
+<h1 class="title"><img src="assets/flag.svg"> Classic minesweeper <img src="assets/flag.svg"></h1>
+<div class="game-container">
   <div class="bar top-bar"></div>
   <div class="top-panel">
     <div class="vertical-bar"></div>
@@ -91,5 +92,53 @@
   <div class="bar bottom-bar"></div>
 </div>
 
+<h3 class="instructions-button" onclick="openInstructionsDialog()">Instructions for Keyboard Gameplay</h3>
+<dialog class="instruction-dialog">
+  <div class="close-instructions-button">&times;</div>
+  <div class="instructions">
+    <ol>
+      <li><strong>Starting a New Game:</strong>
+        <ul>
+          <li>Press the Enter key to start a new game.</li>
+        </ul>
+      </li>
+      <li><strong>Navigation:</strong>
+        <ul>
+          <li>Use the arrow keys (Up, Down, Left, Right) to navigate the grid.</li>
+          <li>Move the cursor to the desired cell.</li>
+        </ul>
+      </li>
+      <li><strong>Revealing Cells:</strong>
+        <ul>
+          <li>Press the '<span class="instruction REVEAL" onclick="editShortcut(this, ACTIONS.REVEAL)">c</span>' key to reveal the content of the highlighted cell.</li>
+          <li>Be cautious! Revealing a mine will end the game.</li>
+        </ul>
+      </li>
+      <li><strong>Flagging Mines:</strong>
+        <ul>
+          <li>Press the '<span class="instruction FLAG" onclick="editShortcut(this, ACTIONS.FLAG)">w</span>' key to flag/unflag a suspected mine.</li>
+          <li>Use flags to mark cells that you believe contain mines.</li>
+        </ul>
+      </li>
+      <li><strong>Double Click Action:</strong>
+        <ul>
+          <li>Double-click on a cell to reveal adjacent cells if the neighboring mines are correctly flagged around it.</li>
+          <li>Press the '<span class="instruction REVEAL_AROUND" onclick="editShortcut(this, ACTIONS.REVEAL_AROUND)">x</span>' reveal around the highlighted cell.</li>
+        </ul>
+      </li>
+      <li><strong>Winning the Game:</strong>
+        <ul>
+          <li>Successfully reveal all non-mine cells to win the game.</li>
+          <li>Use logic and strategy to uncover safe cells without triggering mines.</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+</dialog>
+
+<dialog class="shortcut-dialog">
+
+  Please press a key
+</dialog>
 </body>
 </html>

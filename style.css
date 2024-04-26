@@ -1,8 +1,18 @@
+:root {
+    --cell-size: 23px;
+}
+
 body {
     font-family: "Space Mono", monospace;
 }
 
-.main-container {
+.title {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.game-container {
     width: fit-content;
 }
 
@@ -21,19 +31,19 @@ body {
     background-color: #ccc;
     background-image: url("assets/closed.svg");
     background-size: 100%;
-    width: 23px;
-    height: 23px;
+    width: var(--cell-size);
+    height: var(--cell-size);
     display: inline-block;
     text-align: center;
-    line-height: 23px;
+    line-height: var(--cell-size);
     font-size: 12px;
     font-weight: bold;
 }
 
 .grid-item-highlight {
     position: absolute;
-    width: 23px;
-    height: 23px;
+    width: var(--cell-size);
+    height: var(--cell-size);
     top: 0;
     left: 0;
     background: #ffa500;
@@ -276,7 +286,7 @@ body {
     display: none;
 }
 
-.main-container:has(.main-button.game-won) ~ .results {
+.game-container:has(.main-button.game-won) ~ .results {
     display: block;
 }
 
@@ -317,4 +327,29 @@ body {
     cursor: pointer;
     font-size: 14px;
     padding: 4px 8px;
+}
+
+.instructions-button {
+    width: fit-content;
+    padding: 4px;
+    border: 2px solid black;
+    cursor: pointer;
+}
+
+.close-instructions-button {
+    position: absolute;
+    right: 14px;
+    font-size: 48px;
+    top: -8px;
+    cursor: pointer;
+}
+
+.instruction {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    display: inline-block;
+    cursor: pointer;
+    background-image: url("assets/closed.svg");
+    background-size: 100%;
+    text-align: center;
 }

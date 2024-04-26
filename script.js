@@ -11,8 +11,15 @@ const UI_ELEMENTS = {
   },
   MAIN_BUTTON: '.main-button',
   GRID: '.grid',
+  GAME_CONTAINER: '.game-container',
   GRID_CONTAINER: '.grid-container',
   HIGHLIGHT_ELEMENT: '.grid-item-highlight',
+  DIFFICULTY_BUTTON: '.difficulty-controls button',
+  INSTRUCTIONS_DIALOG: 'dialog.instruction-dialog',
+  SHORTCUT_DIALOG: 'dialog.shortcut-dialog',
+  REVEAL_INSTRUCTION: '.instruction.REVEAL',
+  FLAG_INSTRUCTION: '.instruction.FLAG',
+  REVEAL_AROUND_INSTRUCTION: '.instruction.REVEAL_AROUND',
 };
 
 const CSS_CLASSES = {
@@ -279,10 +286,11 @@ function setDifficulty(config) {
   updateGridConfig(config);
   mainGrid = init(gridConfig.ROWS, gridConfig.COLS, gridConfig.MINES);
   localStorage.setItem(SYMBOLS.CONFIG, JSON.stringify(config));
+  document.querySelector(UI_ELEMENTS.GRID_CONTAINER).focus();
 }
 
 function updateGridConfig(config) {
-  const buttons = document.querySelectorAll('.difficulty-controls button');
+  const buttons = document.querySelectorAll(UI_ELEMENTS.DIFFICULTY_BUTTON);
   buttons.forEach(button => button.classList.remove(CSS_CLASSES.ACTIVE));
 
   const difficultyButton = document.querySelector(`[data-difficulty="${config.DIFFICULTY}"]`);
@@ -356,13 +364,13 @@ document.addEventListener('DOMContentLoaded', function() {
       case 'ArrowDown':
         moveHighlight(0, 1, gridConfig.ROWS - 1, gridConfig.COLS - 1);
         break;
-      case 'w':
+      case getShortcut(ACTIONS.FLAG):
         annotate(mainGrid, highlightY, highlightX);
         break;
-      case 'x':
+      case getShortcut(ACTIONS.REVEAL_AROUND):
         inspectNeighborhood(mainGrid, highlightY, highlightX);
         break;
-      case 'c':
+      case getShortcut(ACTIONS.REVEAL):
         inspect(mainGrid, highlightY, highlightX);
         break;
       default:

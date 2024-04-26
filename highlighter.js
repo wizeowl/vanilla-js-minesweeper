@@ -14,7 +14,3 @@ function moveHighlight(incrementX, incrementY, maxRow, maxCol) {
   highlightY = incrementY < 0 ? Math.max(highlightY + incrementY, 0) : Math.min(highlightY + incrementY, maxRow);
   renderHighlight();
 }
-
-function trackShortcuts() {
-
-}
