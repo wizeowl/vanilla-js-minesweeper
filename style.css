@@ -1,0 +1,320 @@
+body {
+    font-family: "Space Mono", monospace;
+}
+
+.main-container {
+    width: fit-content;
+}
+
+.grid-container {
+    display: flex;
+    position: relative;
+}
+
+.grid {
+    display: grid;
+    border: 2px solid #999;
+    background-color: #666;
+}
+
+.grid-item {
+    background-color: #ccc;
+    background-image: url("assets/closed.svg");
+    background-size: 100%;
+    width: 23px;
+    height: 23px;
+    display: inline-block;
+    text-align: center;
+    line-height: 23px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.grid-item-highlight {
+    position: absolute;
+    width: 23px;
+    height: 23px;
+    top: 0;
+    left: 0;
+    background: #ffa500;
+    opacity: 0.5;
+}
+
+.grid0 {
+    background-image: url("assets/0.svg");
+}
+
+.grid1 {
+    background-image: url("assets/1.svg");
+}
+
+.grid2 {
+    background-image: url("assets/2.svg");
+}
+
+.grid3 {
+    background-image: url("assets/3.svg");
+}
+
+.grid4 {
+    background-image: url("assets/4.svg");
+}
+
+.grid5 {
+    background-image: url("assets/5.svg");
+}
+
+.grid6 {
+    background-image: url("assets/6.svg");
+}
+
+.grid7 {
+    background-image: url("assets/7.svg");
+}
+
+.grid8 {
+    background-image: url("assets/8.svg");
+}
+
+.grid-mine {
+    background-image: url("assets/mine.svg");
+}
+
+.grid-error {
+    background-image: url("assets/mine_red.svg");
+}
+
+.grid-flag {
+    background-image: url("assets/flag.svg");
+}
+
+.top-panel, .bottom-panel {
+    height: 48px;
+    display: flex;
+}
+
+.top-controls, .difficulty-controls {
+    background: silver;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+}
+
+.top-controls {
+    justify-content: space-between;
+}
+.top-controls, .difficulty-controls {
+    justify-content: space-evenly;
+}
+
+.difficulty-controls button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #606161;
+}
+
+.difficulty-controls button.active {
+    color: #353f4a;
+    font-weight: bold;
+}
+
+.vertical-bar {
+    width: 18px;
+    height: 100%;
+    background-image: url("assets/border_vert_2x.png");
+    background-size: 100% 100%;
+}
+
+.number {
+    background-size: 100% 100%;
+    width: 16.5px;
+    height: 31.5px;
+}
+
+.d0 {
+    background-image: url("assets/d0.svg");
+}
+
+.d1 {
+    background-image: url("assets/d1.svg");
+}
+
+.d2 {
+    background-image: url("assets/d2.svg");
+}
+
+.d3 {
+    background-image: url("assets/d3.svg");
+}
+
+.d4 {
+    background-image: url("assets/d4.svg");
+}
+
+.d5 {
+    background-image: url("assets/d5.svg");
+}
+
+.d6 {
+    background-image: url("assets/d6.svg");
+}
+
+.d7 {
+    background-image: url("assets/d7.svg");
+}
+
+.d8 {
+    background-image: url("assets/d8.svg");
+}
+
+.d9 {
+    background-image: url("assets/d9.svg");
+}
+
+.numbers-panel {
+    padding: 0 3.5px;
+    width: 61.5px;
+    height: 37.5px;
+    margin: 4.5px;
+    background: black;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mine_counter {
+}
+
+.main-button {
+    margin: 4.5px;
+    width: 39px;
+    height: 39px;
+    background-image: url("assets/face_unpressed.svg");
+    background-size: 100% 100%;
+    cursor: pointer;
+}
+
+.main-button:active {
+    background-image: url("assets/face_pressed.svg");
+}
+
+.game-over {
+    background-image: url("assets/face_lose.svg");
+}
+
+.game-won {
+    background-image: url("assets/face_win.svg");
+}
+
+.timer {
+}
+
+.bar {
+    display: flex;
+    height: 16.5px;
+    position: relative;
+}
+
+.bar::before,
+.bar::after {
+    content: "";
+    width: 18px;
+    height: 16.5px;
+    background-size: 100% 100%;
+    position: absolute;
+    top: 0;
+}
+
+.bar::before {
+    background-image: url("assets/t_left_2x.png");
+    left: 0;
+}
+
+.bar::after {
+    background-image: url("assets/t_right_2x.png");
+    right: 0;
+}
+
+.bar.top-bar::before {
+    background-image: url("assets/corner_up_left_2x.png");
+}
+
+.bar.top-bar::after {
+    background-image: url("assets/corner_up_right_2x.png");
+}
+
+.bar.bottom-bar::before {
+    background-image: url("assets/corner_bottom_left_wide_2x.png");
+}
+
+.bar.bottom-bar::after {
+    background-image: url("assets/corner_bottom_right_wide_2x.png");
+}
+
+.bar {
+    background-image: url("assets/border_hor_2x.png");
+    background-size: 100% 100%;
+    flex-grow: 1;
+}
+
+.bottom-bar {
+    height: 45px;
+    background-image: url("assets/border_hor_wide_2x.png");
+}
+
+.bottom-bar::before,
+.bottom-bar::after {
+    height: 45px;
+}
+
+.results {
+    position: absolute;
+    top: 80px;
+    left: 60px;
+    font-size: 13px;
+    display: none;
+}
+
+.main-container:has(.main-button.game-won) ~ .results {
+    display: block;
+}
+
+.results-subtitle {
+    text-align: center;
+}
+
+.results-subtitle:nth-child(2) {
+    margin-bottom: 24px;
+}
+
+.results-panel {
+    display: flex;
+    height: 300px;
+}
+
+.result-details {
+    background: silver;
+    padding: 20px;
+}
+
+.result-items {
+    display: grid;
+    grid-template-rows: repeat(5, auto);
+    grid-template-columns: 1fr 1fr;
+}
+
+.result-item {
+    padding: 10px;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.new-game-button {
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 4px 8px;
+}

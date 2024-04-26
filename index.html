@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css?family=Space+Mono:400,700" rel="stylesheet">
+  <title>Classic Minesweeper Grid</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="lib.js"></script>
+  <script src="script.js"></script>
+  <script src="counters.js"></script>
+  <script src="highlighter.js"></script>
+  <script src="statistics.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="main-container">
+  <div class="bar top-bar"></div>
+  <div class="top-panel">
+    <div class="vertical-bar"></div>
+    <div class="top-controls">
+      <div class="numbers-panel mine_counter">
+        <div class="number d0 mines-hundreds"></div>
+        <div class="number d0 mines-tens"></div>
+        <div class="number d0 mines-digits"></div>
+      </div>
+      <div class="main-button" onclick="init(gridConfig.ROWS, gridConfig.COLS, gridConfig.MINES);"></div>
+      <div class="numbers-panel timer">
+        <div class="number d0 timer-hundreds"></div>
+        <div class="number d0 timer-tens"></div>
+        <div class="number d0 timer-digits"></div>
+      </div>
+    </div>
+    <div class="vertical-bar"></div>
+  </div>
+  <div class="bar"></div>
+  <div class="grid-container">
+    <div class="vertical-bar"></div>
+    <div
+      class="grid-item-highlight"
+      onclick="inspect(mainGrid, highlightY, highlightX)"
+      oncontextmenu="annotate(mainGrid, highlightY, highlightX); return false;"
+    ></div>
+    <div class="grid"></div>
+    <div class="vertical-bar"></div>
+  </div>
+  <div class="bar"></div>
+  <div class="bottom-panel">
+    <div class="vertical-bar"></div>
+    <div class="difficulty-controls">
+      <button type="button" data-difficulty="BEGINNER" onclick="setDifficulty(BEGINNER_GRID_CONFIG)">Beginner</button>
+      <button type="button" data-difficulty="INTERMEDIATE" onclick="setDifficulty(INTERMEDIATE_GRID_CONFIG)">
+        Intermediate
+      </button>
+      <button type="button" data-difficulty="EXPERT" onclick="setDifficulty(EXPERT_GRID_CONFIG)">Expert</button>
+    </div>
+    <div class="vertical-bar"></div>
+  </div>
+  <div class="bar bottom-bar"></div>
+
+</div>
+
+<div class="results">
+  <div class="bar top-bar"></div>
+  <div class="results-panel">
+    <div class="vertical-bar"></div>
+    <div class="result-details">
+      <div class="results-subtitle">Congratulations: You won the game!</div>
+      <div class="results-subtitle best-result"></div>
+      <div class="result-items">
+        <div class="result-item">Time: 42 seconds</div>
+        <div class="result-item">Date: 11/11/2009</div>
+        <div class="result-item full-width">Best time: 37 seconds</div>
+        <div class="result-item full-width">Games played: 10</div>
+        <div class="result-item">Games won: 8</div>
+        <div class="result-item">Percentage: 80%</div>
+        <div class="result-item">
+          <button
+            type="button"
+            class="new-game-button"
+            onclick="init(gridConfig.ROWS, gridConfig.COLS, gridConfig.MINES);"
+          >
+            New game
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="vertical-bar"></div>
+  </div>
+  <div class="bar bottom-bar"></div>
+</div>
+
+</body>
+</html>
