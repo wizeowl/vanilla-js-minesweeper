@@ -76,6 +76,14 @@ const CELL_SIZE = 23;
 const DOUBLE_TAP_THRESHOLD_MS = 300;
 const LONG_PRESS_THRESHOLD_MS = 450;
 const GHOST_CLICK_THRESHOLD_MS = 700;
+const HAPTIC_THROTTLE_MS = 40;
+
+const HAPTIC_PATTERNS = {
+  REVEAL: 12,
+  FLAG: [18],
+  WIN: [30, 40, 55],
+  GAME_OVER: [65, 40, 65],
+};
 
 let showQuestionMark = false;
 let debugMode = false;
@@ -106,6 +114,21 @@ let timerDigits;
 let lastClickTime = 0;
 let lastTouchInteractionTime = 0;
 let lastTap = null;
+let lastHapticTimestamp = 0;
+
+function triggerHaptic(pattern) {
+  if (typeof navigator === 'undefined' || typeof navigator.vibrate !== 'function') {
+    return;
+  }
+
+  const now = Date.now();
+  if (now - lastHapticTimestamp < HAPTIC_THROTTLE_MS) {
+    return;
+  }
+
+  navigator.vibrate(pattern);
+  lastHapticTimestamp = now;
+}
 
 function paintGrid(grid) {
   const container = document.querySelector(UI_ELEMENTS.GRID);
@@ -245,6 +268,7 @@ function annotate(grid, row, col) {
   }
 
   updateMinesCounter();
+  triggerHaptic(HAPTIC_PATTERNS.FLAG);
 }
 
 function inspectNeighborhood(grid, row, col) {
@@ -258,15 +282,18 @@ function inspectNeighborhood(grid, row, col) {
   const neighboringFlags = neighboringSquares.filter(([_, i, j]) => flagged.has(`${i}, ${j}`)).length;
 
   if (neighboringFlags === minesAround) {
+    triggerHaptic(HAPTIC_PATTERNS.REVEAL);
     neighboringSquares.forEach(([_, i, j]) => {
       if (!flagged.has(`${i}, ${j}`)) {
-        inspect(grid, i, j);
+        inspect(grid, i, j, { triggerRevealHaptic: false });
       }
     });
   }
 }
 
-function inspect(grid, row, col) {
+function inspect(grid, row, col, options = {}) {
+  const { triggerRevealHaptic = true } = options;
+
   if (!timerTicking) {
     startTimer();
   }
@@ -279,6 +306,7 @@ function inspect(grid, row, col) {
 
   if (grid[row][col] === SYMBOLS.MINE) {
     status = SYMBOLS.GAME_OVER;
+    triggerHaptic(HAPTIC_PATTERNS.GAME_OVER);
     showMines(grid);
     showError(row, col);
     return;
@@ -290,13 +318,17 @@ function inspect(grid, row, col) {
   }
 
   visited.add(key);
+  if (triggerRevealHaptic) {
+    triggerHaptic(HAPTIC_PATTERNS.REVEAL);
+  }
+
   const square = getNeighboringSquares(grid, row, col);
   const minesAround = square.filter(([cell]) => cell === SYMBOLS.MINE).length;
   const gridItem = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
   gridItem.classList.add('grid' + minesAround);
 
   if (minesAround === 0) {
-    square.forEach(([_, i, j]) => inspect(grid, i, j));
+    square.forEach(([_, i, j]) => inspect(grid, i, j, { triggerRevealHaptic: false }));
   }
 
   checkWin();
@@ -305,6 +337,7 @@ function inspect(grid, row, col) {
 function checkWin() {
   const target = cols * rows - mines;
   if (target === visited.size) {
+    triggerHaptic(HAPTIC_PATTERNS.WIN);
     registerWin(gridConfig.DIFFICULTY, time);
     calculateResults();
     status = SYMBOLS.WON;

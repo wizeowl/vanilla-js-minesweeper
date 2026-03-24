@@ -9,6 +9,7 @@ A **Minesweeper** game inspired by the classic Windows version, built with **HTM
 - Keyboard support with a visual selection cursor
 - Customizable keyboard shortcuts from the instructions dialog
 - Accessible interactive controls (ARIA labels and keyboard activation for custom UI elements)
+- Haptic feedback on supported devices for reveal, flag, win, and game over
 - Retro-style mine counter and timer
 - Per-difficulty statistics persisted via `localStorage`
 
@@ -76,6 +77,5 @@ To reset everything, clear the site's keys from your browser local storage.
 ## Possible improvements
 
 - Add unit tests for grid and win-condition logic
-- Add vibration/haptic feedback for reveal, flag, win, and game over events on supported devices
 - Add a small npm dev script (`serve`) for quicker startup
 
