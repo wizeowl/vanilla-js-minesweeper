@@ -375,8 +375,22 @@ function getDifficultyConfig(difficulty) {
   }
 }
 
+function bindKeyboardActivation(element, callback) {
+  if (!element) {
+    return;
+  }
+
+  element.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      callback();
+    }
+  });
+}
+
 function bindStaticEventListeners() {
   mainButton.addEventListener('click', startNewGame);
+  bindKeyboardActivation(mainButton, startNewGame);
 
   const newGameButton = document.querySelector(UI_ELEMENTS.NEW_GAME_BUTTON);
   if (newGameButton) {
@@ -388,10 +402,12 @@ function bindStaticEventListeners() {
     event.preventDefault();
     annotate(mainGrid, highlightY, highlightX);
   });
+  bindKeyboardActivation(highlightElement, () => inspect(mainGrid, highlightY, highlightX));
 
   const instructionsButton = document.querySelector(UI_ELEMENTS.INSTRUCTIONS_BUTTON);
   if (instructionsButton) {
     instructionsButton.addEventListener('click', openInstructionsDialog);
+    bindKeyboardActivation(instructionsButton, openInstructionsDialog);
   }
 
   document.querySelectorAll(UI_ELEMENTS.DIFFICULTY_BUTTON).forEach((button) => {
@@ -404,12 +420,15 @@ function bindStaticEventListeners() {
   });
 
   document.querySelectorAll(UI_ELEMENTS.SHORTCUT_INSTRUCTION).forEach((element) => {
-    element.addEventListener('click', () => {
+    const openShortcutEditor = () => {
       const action = element.dataset.action;
       if (action && ACTIONS[action]) {
         editShortcut(element, ACTIONS[action]);
       }
-    });
+    };
+
+    element.addEventListener('click', openShortcutEditor);
+    bindKeyboardActivation(element, openShortcutEditor);
   });
 }
 
@@ -467,6 +486,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   if (closeInstructionsButton) {
     closeInstructionsButton.addEventListener('click', closeInstructionsDialog);
+    bindKeyboardActivation(closeInstructionsButton, closeInstructionsDialog);
   }
 
   bindStaticEventListeners();

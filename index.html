@@ -14,7 +14,7 @@
   <script src="controls.js"></script>
 </head>
 <body>
-<h1 class="title"><img src="assets/flag.svg"> Classic minesweeper <img src="assets/flag.svg"></h1>
+<h1 class="title"><img src="assets/flag.svg" alt="" aria-hidden="true"> Classic minesweeper <img src="assets/flag.svg" alt="" aria-hidden="true"></h1>
 <div class="game-container">
   <div class="bar top-bar"></div>
   <div class="top-panel">
@@ -25,7 +25,7 @@
         <div class="number d0 mines-tens"></div>
         <div class="number d0 mines-digits"></div>
       </div>
-      <div class="main-button"></div>
+      <div class="main-button" role="button" tabindex="0" aria-label="Start a new game"></div>
       <div class="numbers-panel timer">
         <div class="number d0 timer-hundreds"></div>
         <div class="number d0 timer-tens"></div>
@@ -37,7 +37,7 @@
   <div class="bar"></div>
   <div class="grid-container">
     <div class="vertical-bar"></div>
-    <div class="grid-item-highlight"></div>
+    <div class="grid-item-highlight" role="button" tabindex="0" aria-label="Reveal selected cell"></div>
     <div class="grid"></div>
     <div class="vertical-bar"></div>
   </div>
@@ -86,9 +86,9 @@
   <div class="bar bottom-bar"></div>
 </div>
 
-<h3 class="instructions-button">Instructions for Keyboard Gameplay</h3>
+<h3 class="instructions-button" role="button" tabindex="0" aria-label="Open keyboard instructions">Instructions for Keyboard Gameplay</h3>
 <dialog class="instruction-dialog">
-  <div class="close-instructions-button">&times;</div>
+  <div class="close-instructions-button" role="button" tabindex="0" aria-label="Close instructions">&times;</div>
   <div class="instructions">
     <ol>
       <li><strong>Starting a New Game:</strong>
@@ -104,20 +104,20 @@
       </li>
       <li><strong>Revealing Cells:</strong>
         <ul>
-          <li>Press the '<span class="instruction REVEAL" data-action="REVEAL">c</span>' key to reveal the content of the highlighted cell.</li>
+          <li>Press the '<span class="instruction REVEAL" data-action="REVEAL" role="button" tabindex="0" aria-label="Edit reveal shortcut">c</span>' key to reveal the content of the highlighted cell.</li>
           <li>Be cautious! Revealing a mine will end the game.</li>
         </ul>
       </li>
       <li><strong>Flagging Mines:</strong>
         <ul>
-          <li>Press the '<span class="instruction FLAG" data-action="FLAG">w</span>' key to flag/unflag a suspected mine.</li>
+          <li>Press the '<span class="instruction FLAG" data-action="FLAG" role="button" tabindex="0" aria-label="Edit flag shortcut">w</span>' key to flag/unflag a suspected mine.</li>
           <li>Use flags to mark cells that you believe contain mines.</li>
         </ul>
       </li>
       <li><strong>Double Click Action:</strong>
         <ul>
           <li>Double-click on a cell to reveal adjacent cells if the neighboring mines are correctly flagged around it.</li>
-          <li>Press the '<span class="instruction REVEAL_AROUND" data-action="REVEAL_AROUND">x</span>' reveal around the highlighted cell.</li>
+          <li>Press the '<span class="instruction REVEAL_AROUND" data-action="REVEAL_AROUND" role="button" tabindex="0" aria-label="Edit reveal around shortcut">x</span>' reveal around the highlighted cell.</li>
         </ul>
       </li>
       <li><strong>Touch Controls (Mobile/Tablets):</strong>
