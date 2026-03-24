@@ -74,8 +74,4 @@ The game stores:
 
 To reset everything, clear the site's keys from your browser local storage.
 
-## Possible improvements
-
-- Add unit tests for grid and win-condition logic
-- Add a small npm dev script (`serve`) for quicker startup
 

@@ -59,7 +59,6 @@ function getDefaultShortcut(action) {
     case ACTIONS.FLAG:
       return 'w';
     default:
-      console.log('unknown action');
       return;
   }
 }

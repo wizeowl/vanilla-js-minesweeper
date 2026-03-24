@@ -578,7 +578,6 @@ document.addEventListener('DOMContentLoaded', function() {
         inspect(mainGrid, highlightY, highlightX);
         break;
       default:
-        console.log(event.key);
       // Ignore other keys
     }
   });
