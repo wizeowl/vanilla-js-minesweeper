@@ -115,6 +115,7 @@ let lastClickTime = 0;
 let lastTouchInteractionTime = 0;
 let lastTap = null;
 let lastHapticTimestamp = 0;
+let gridItems = [];
 
 function triggerHaptic(pattern) {
   if (typeof navigator === 'undefined' || typeof navigator.vibrate !== 'function') {
@@ -130,9 +131,15 @@ function triggerHaptic(pattern) {
   lastHapticTimestamp = now;
 }
 
+function getGridItem(row, col) {
+  return gridItems[row]?.[col] ?? null;
+}
+
 function paintGrid(grid) {
   const container = document.querySelector(UI_ELEMENTS.GRID);
   container.innerHTML = '';
+  gridItems = Array.from({ length: grid.length }, () => Array(grid[0].length));
+  const fragment = document.createDocumentFragment();
 
   grid.forEach((row, i) => {
     row.forEach((element, j) => {
@@ -218,16 +225,19 @@ function paintGrid(grid) {
 
       if (debugMode && grid[i][j]) gridItem.textContent = SYMBOLS.MINE;
 
-      container.appendChild(gridItem);
+      gridItems[i][j] = gridItem;
+      fragment.appendChild(gridItem);
     });
   });
+
+  container.appendChild(fragment);
 }
 
 function showMines(grid) {
   grid.forEach((row, i) => {
     row.forEach((element, j) => {
       if (grid[i][j] === SYMBOLS.MINE) {
-        const gridItem = document.querySelector(`[data-row="${i}"][data-col="${j}"]`);
+        const gridItem = getGridItem(i, j);
         gridItem.classList.add(CSS_CLASSES.MINE);
       }
     });
@@ -235,7 +245,7 @@ function showMines(grid) {
 }
 
 function showError(row, col) {
-  const gridItem = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+  const gridItem = getGridItem(row, col);
   gridItem.classList.remove(CSS_CLASSES.MINE);
   gridItem.classList.add(CSS_CLASSES.ERROR);
   mainButton.classList.add(CSS_CLASSES.GAME_OVER);
@@ -249,7 +259,7 @@ function annotate(grid, row, col) {
     return;
   }
 
-  const gridItem = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+  const gridItem = getGridItem(row, col);
   const hasFlag = gridItem.classList.contains(CSS_CLASSES.FLAG);
   const hasQuestionMark = gridItem.classList.contains(CSS_CLASSES.QUESTION_MARK);
 
@@ -324,7 +334,7 @@ function inspect(grid, row, col, options = {}) {
 
   const square = getNeighboringSquares(grid, row, col);
   const minesAround = square.filter(([cell]) => cell === SYMBOLS.MINE).length;
-  const gridItem = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+  const gridItem = getGridItem(row, col);
   gridItem.classList.add('grid' + minesAround);
 
   if (minesAround === 0) {
