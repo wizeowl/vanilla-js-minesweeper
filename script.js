@@ -70,6 +70,9 @@ const EXPERT_GRID_CONFIG = {
 };
 
 const CELL_SIZE = 23;
+const DOUBLE_TAP_THRESHOLD_MS = 300;
+const LONG_PRESS_THRESHOLD_MS = 450;
+const GHOST_CLICK_THRESHOLD_MS = 700;
 
 let showQuestionMark = false;
 let debugMode = false;
@@ -98,6 +101,8 @@ let timerTens;
 let timerDigits;
 
 let lastClickTime = 0;
+let lastTouchInteractionTime = 0;
+let lastTap = null;
 
 function paintGrid(grid) {
   const container = document.querySelector(UI_ELEMENTS.GRID);
@@ -111,9 +116,13 @@ function paintGrid(grid) {
       gridItem.dataset.col = j;
 
       gridItem.addEventListener('click', () => {
+        if (Date.now() - lastTouchInteractionTime < GHOST_CLICK_THRESHOLD_MS) {
+          return;
+        }
+
         const currentTime = new Date().getTime();
         const timeDiff = currentTime - lastClickTime;
-        if (timeDiff < 300) {
+        if (timeDiff < DOUBLE_TAP_THRESHOLD_MS) {
           // Handle double-click action here
           inspectNeighborhood(grid, i, j);
 
@@ -131,6 +140,54 @@ function paintGrid(grid) {
       gridItem.addEventListener('contextmenu', (event) => {
         event.preventDefault();
         annotate(grid, i, j);
+      });
+
+      let longPressTimeout;
+      let longPressTriggered = false;
+
+      gridItem.addEventListener('touchstart', (event) => {
+        event.preventDefault();
+        longPressTriggered = false;
+
+        longPressTimeout = setTimeout(() => {
+          annotate(grid, i, j);
+          longPressTriggered = true;
+          lastTap = null;
+          lastTouchInteractionTime = Date.now();
+        }, LONG_PRESS_THRESHOLD_MS);
+      }, { passive: false });
+
+      gridItem.addEventListener('touchend', (event) => {
+        event.preventDefault();
+        clearTimeout(longPressTimeout);
+
+        if (longPressTriggered) {
+          return;
+        }
+
+        const now = Date.now();
+        const isDoubleTap = lastTap
+          && lastTap.row === i
+          && lastTap.col === j
+          && now - lastTap.time < DOUBLE_TAP_THRESHOLD_MS;
+
+        if (isDoubleTap) {
+          inspectNeighborhood(grid, i, j);
+          lastTap = null;
+        } else {
+          inspect(grid, i, j);
+          lastTap = { row: i, col: j, time: now };
+        }
+
+        lastTouchInteractionTime = now;
+      }, { passive: false });
+
+      gridItem.addEventListener('touchmove', () => {
+        clearTimeout(longPressTimeout);
+      }, { passive: true });
+
+      gridItem.addEventListener('touchcancel', () => {
+        clearTimeout(longPressTimeout);
       });
 
       if (debugMode && grid[i][j]) gridItem.innerHTML = SYMBOLS.MINE;
@@ -324,6 +381,8 @@ function init(numRows, numCols, numMines) {
   visited = new Set();
   flagged = new Set();
   status = SYMBOLS.CURRENT;
+  lastTap = null;
+  lastTouchInteractionTime = 0;
   updateMinesCounter();
 
   initHighlight();

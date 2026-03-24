@@ -54,6 +54,12 @@ Then open `http://localhost:8000`.
 
 > `f`, `w`, and `x` are the default keys and can be changed via "Instructions for Keyboard Gameplay".
 
+### Touch (Mobile/Tablet)
+
+- **Tap**: reveal a cell
+- **Long press**: place/remove a flag
+- **Double tap** on a revealed cell: reveal surrounding cells
+
 ## Persistence (`localStorage`)
 
 The game stores:
@@ -71,6 +77,6 @@ To reset everything, clear the site's keys from your browser local storage.
 - Add unit tests for grid and win-condition logic
 - Replace inline HTML handlers (`onclick`) with JS event listeners only
 - Add accessibility labels/attributes (e.g., `alt` on images)
-- Improve mobile/touch gameplay support
+- Add vibration/haptic feedback for reveal, flag, win, and game over events on supported devices
 - Add a small npm dev script (`serve`) for quicker startup
 
