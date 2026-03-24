@@ -16,6 +16,7 @@ const UI_ELEMENTS = {
   HIGHLIGHT_ELEMENT: '.grid-item-highlight',
   DIFFICULTY_BUTTON: '.difficulty-controls button',
   INSTRUCTIONS_DIALOG: 'dialog.instruction-dialog',
+  CLOSE_INSTRUCTIONS_BUTTON: '.close-instructions-button',
   SHORTCUT_DIALOG: 'dialog.shortcut-dialog',
   REVEAL_INSTRUCTION: '.instruction.REVEAL',
   FLAG_INSTRUCTION: '.instruction.FLAG',
@@ -187,14 +188,22 @@ function annotate(grid, row, col) {
 }
 
 function inspectNeighborhood(grid, row, col) {
-  const neighboringSquares = getNeighboringSquares(grid, row, col);
-  const neighboringMines = neighboringSquares.filter(([s]) => s === SYMBOLS.MINE);
-  const neighboringNonMines = neighboringSquares.filter(([s]) => s !== SYMBOLS.MINE);
-  const allNeighboringMinesAreFlagged = neighboringMines.every(([_, i, j]) => flagged.has(`${i}, ${j}`));
-  if (allNeighboringMinesAreFlagged) {
-    neighboringNonMines.forEach(([_, i, j]) => inspect(grid, i, j));
+  const key = `${row}, ${col}`;
+  if (!visited.has(key) || status === SYMBOLS.GAME_OVER || status === SYMBOLS.WON) {
+    return;
   }
-  inspect(grid, row, col);
+
+  const neighboringSquares = getNeighboringSquares(grid, row, col);
+  const minesAround = neighboringSquares.filter(([cell]) => cell === SYMBOLS.MINE).length;
+  const neighboringFlags = neighboringSquares.filter(([_, i, j]) => flagged.has(`${i}, ${j}`)).length;
+
+  if (neighboringFlags === minesAround) {
+    neighboringSquares.forEach(([_, i, j]) => {
+      if (!flagged.has(`${i}, ${j}`)) {
+        inspect(grid, i, j);
+      }
+    });
+  }
 }
 
 function inspect(grid, row, col) {
@@ -237,14 +246,14 @@ function checkWin() {
   const target = cols * rows - mines;
   if (target === visited.size) {
     registerWin(gridConfig.DIFFICULTY, time);
-    calulateResults();
+    calculateResults();
     status = SYMBOLS.WON;
     mainButton.classList.add(CSS_CLASSES.GAME_WON);
     stopTimer();
   }
 }
 
-function calulateResults() {
+function calculateResults() {
   const date = new Date();
   const statistics = getDifficultyStatistics(gridConfig.DIFFICULTY);
   const percentage = statistics.gamesPlayed ? Math.round((statistics.gamesWon * 100) / statistics.gamesPlayed) : 0;
@@ -297,9 +306,9 @@ function updateGridConfig(config) {
   difficultyButton.classList.add(CSS_CLASSES.ACTIVE);
 
   gridConfig = config;
-  rows = config.rows;
-  cols = config.cols;
-  mines = config.mines;
+  rows = config.ROWS ?? config.rows;
+  cols = config.COLS ?? config.cols;
+  mines = config.MINES ?? config.mines;
 }
 
 function init(numRows, numCols, numMines) {
@@ -337,6 +346,11 @@ document.addEventListener('DOMContentLoaded', function() {
   timerTens = document.querySelector(UI_ELEMENTS.TIMER.TENS);
   timerDigits = document.querySelector(UI_ELEMENTS.TIMER.DIGITS);
   highlightElement = document.querySelector(UI_ELEMENTS.HIGHLIGHT_ELEMENT);
+  const closeInstructionsButton = document.querySelector(UI_ELEMENTS.CLOSE_INSTRUCTIONS_BUTTON);
+
+  if (closeInstructionsButton) {
+    closeInstructionsButton.addEventListener('click', closeInstructionsDialog);
+  }
 
   updateGridConfig(getDefaultDifficultyConfig());
   mainGrid = init(gridConfig.ROWS, gridConfig.COLS, gridConfig.MINES);

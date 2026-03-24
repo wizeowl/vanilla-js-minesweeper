@@ -25,11 +25,11 @@ function registerWin(difficulty, winTime) {
   if(isNaN(savedStatistics[difficulty].bestTime) || winTime < savedStatistics[difficulty].bestTime) {
     savedStatistics[difficulty].bestTime = winTime;
   }
-  localStorage.setItem(SYMBOLS.STATISTICS, savedStatistics);
+  localStorage.setItem(SYMBOLS.STATISTICS, JSON.stringify(savedStatistics));
 }
 
 function registerLoss(difficulty) {
   const savedStatistics = getSavedStatistics();
   savedStatistics[difficulty].gamesPlayed++;
-  localStorage.setItem(SYMBOLS.STATISTICS, savedStatistics);
+  localStorage.setItem(SYMBOLS.STATISTICS, JSON.stringify(savedStatistics));
 }
