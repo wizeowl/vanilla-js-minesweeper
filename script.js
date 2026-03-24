@@ -421,6 +421,10 @@ function bindKeyboardActivation(element, callback) {
   });
 }
 
+function isDialogOpen() {
+  return Boolean(document.querySelector('dialog[open]'));
+}
+
 function bindStaticEventListeners() {
   mainButton.addEventListener('click', startNewGame);
   bindKeyboardActivation(mainButton, startNewGame);
@@ -528,6 +532,10 @@ document.addEventListener('DOMContentLoaded', function() {
   mainGrid = init(gridConfig.ROWS, gridConfig.COLS, gridConfig.MINES);
 
   document.addEventListener('keydown', function(event) {
+    if (event.defaultPrevented || isDialogOpen()) {
+      return;
+    }
+
     // the new game shortcut should function regardless of the game status
     if (event.key === 'Enter') {
       startNewGame();
