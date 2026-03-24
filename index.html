@@ -25,7 +25,7 @@
         <div class="number d0 mines-tens"></div>
         <div class="number d0 mines-digits"></div>
       </div>
-      <div class="main-button" onclick="init(gridConfig.ROWS, gridConfig.COLS, gridConfig.MINES);"></div>
+      <div class="main-button"></div>
       <div class="numbers-panel timer">
         <div class="number d0 timer-hundreds"></div>
         <div class="number d0 timer-tens"></div>
@@ -37,11 +37,7 @@
   <div class="bar"></div>
   <div class="grid-container">
     <div class="vertical-bar"></div>
-    <div
-      class="grid-item-highlight"
-      onclick="inspect(mainGrid, highlightY, highlightX)"
-      oncontextmenu="annotate(mainGrid, highlightY, highlightX); return false;"
-    ></div>
+    <div class="grid-item-highlight"></div>
     <div class="grid"></div>
     <div class="vertical-bar"></div>
   </div>
@@ -49,11 +45,11 @@
   <div class="bottom-panel">
     <div class="vertical-bar"></div>
     <div class="difficulty-controls">
-      <button type="button" data-difficulty="BEGINNER" onclick="setDifficulty(BEGINNER_GRID_CONFIG)">Beginner</button>
-      <button type="button" data-difficulty="INTERMEDIATE" onclick="setDifficulty(INTERMEDIATE_GRID_CONFIG)">
+      <button type="button" data-difficulty="BEGINNER">Beginner</button>
+      <button type="button" data-difficulty="INTERMEDIATE">
         Intermediate
       </button>
-      <button type="button" data-difficulty="EXPERT" onclick="setDifficulty(EXPERT_GRID_CONFIG)">Expert</button>
+      <button type="button" data-difficulty="EXPERT">Expert</button>
     </div>
     <div class="vertical-bar"></div>
   </div>
@@ -79,7 +75,6 @@
           <button
             type="button"
             class="new-game-button"
-            onclick="init(gridConfig.ROWS, gridConfig.COLS, gridConfig.MINES);"
           >
             New game
           </button>
@@ -91,7 +86,7 @@
   <div class="bar bottom-bar"></div>
 </div>
 
-<h3 class="instructions-button" onclick="openInstructionsDialog()">Instructions for Keyboard Gameplay</h3>
+<h3 class="instructions-button">Instructions for Keyboard Gameplay</h3>
 <dialog class="instruction-dialog">
   <div class="close-instructions-button">&times;</div>
   <div class="instructions">
@@ -109,20 +104,20 @@
       </li>
       <li><strong>Revealing Cells:</strong>
         <ul>
-          <li>Press the '<span class="instruction REVEAL" onclick="editShortcut(this, ACTIONS.REVEAL)">c</span>' key to reveal the content of the highlighted cell.</li>
+          <li>Press the '<span class="instruction REVEAL" data-action="REVEAL">c</span>' key to reveal the content of the highlighted cell.</li>
           <li>Be cautious! Revealing a mine will end the game.</li>
         </ul>
       </li>
       <li><strong>Flagging Mines:</strong>
         <ul>
-          <li>Press the '<span class="instruction FLAG" onclick="editShortcut(this, ACTIONS.FLAG)">w</span>' key to flag/unflag a suspected mine.</li>
+          <li>Press the '<span class="instruction FLAG" data-action="FLAG">w</span>' key to flag/unflag a suspected mine.</li>
           <li>Use flags to mark cells that you believe contain mines.</li>
         </ul>
       </li>
       <li><strong>Double Click Action:</strong>
         <ul>
           <li>Double-click on a cell to reveal adjacent cells if the neighboring mines are correctly flagged around it.</li>
-          <li>Press the '<span class="instruction REVEAL_AROUND" onclick="editShortcut(this, ACTIONS.REVEAL_AROUND)">x</span>' reveal around the highlighted cell.</li>
+          <li>Press the '<span class="instruction REVEAL_AROUND" data-action="REVEAL_AROUND">x</span>' reveal around the highlighted cell.</li>
         </ul>
       </li>
       <li><strong>Touch Controls (Mobile/Tablets):</strong>

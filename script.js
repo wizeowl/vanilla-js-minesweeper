@@ -10,6 +10,7 @@ const UI_ELEMENTS = {
     DIGITS: '.timer-digits',
   },
   MAIN_BUTTON: '.main-button',
+  NEW_GAME_BUTTON: '.new-game-button',
   GRID: '.grid',
   GAME_CONTAINER: '.game-container',
   GRID_CONTAINER: '.grid-container',
@@ -21,6 +22,8 @@ const UI_ELEMENTS = {
   REVEAL_INSTRUCTION: '.instruction.REVEAL',
   FLAG_INSTRUCTION: '.instruction.FLAG',
   REVEAL_AROUND_INSTRUCTION: '.instruction.REVEAL_AROUND',
+  INSTRUCTIONS_BUTTON: '.instructions-button',
+  SHORTCUT_INSTRUCTION: '.instruction[data-action]',
 };
 
 const CSS_CLASSES = {
@@ -355,6 +358,61 @@ function setDifficulty(config) {
   document.querySelector(UI_ELEMENTS.GRID_CONTAINER).focus();
 }
 
+function startNewGame() {
+  mainGrid = init(gridConfig.ROWS, gridConfig.COLS, gridConfig.MINES);
+}
+
+function getDifficultyConfig(difficulty) {
+  switch (difficulty) {
+    case SYMBOLS.BEGINNER:
+      return BEGINNER_GRID_CONFIG;
+    case SYMBOLS.INTERMEDIATE:
+      return INTERMEDIATE_GRID_CONFIG;
+    case SYMBOLS.EXPERT:
+      return EXPERT_GRID_CONFIG;
+    default:
+      return null;
+  }
+}
+
+function bindStaticEventListeners() {
+  mainButton.addEventListener('click', startNewGame);
+
+  const newGameButton = document.querySelector(UI_ELEMENTS.NEW_GAME_BUTTON);
+  if (newGameButton) {
+    newGameButton.addEventListener('click', startNewGame);
+  }
+
+  highlightElement.addEventListener('click', () => inspect(mainGrid, highlightY, highlightX));
+  highlightElement.addEventListener('contextmenu', (event) => {
+    event.preventDefault();
+    annotate(mainGrid, highlightY, highlightX);
+  });
+
+  const instructionsButton = document.querySelector(UI_ELEMENTS.INSTRUCTIONS_BUTTON);
+  if (instructionsButton) {
+    instructionsButton.addEventListener('click', openInstructionsDialog);
+  }
+
+  document.querySelectorAll(UI_ELEMENTS.DIFFICULTY_BUTTON).forEach((button) => {
+    button.addEventListener('click', () => {
+      const config = getDifficultyConfig(button.dataset.difficulty);
+      if (config) {
+        setDifficulty(config);
+      }
+    });
+  });
+
+  document.querySelectorAll(UI_ELEMENTS.SHORTCUT_INSTRUCTION).forEach((element) => {
+    element.addEventListener('click', () => {
+      const action = element.dataset.action;
+      if (action && ACTIONS[action]) {
+        editShortcut(element, ACTIONS[action]);
+      }
+    });
+  });
+}
+
 function updateGridConfig(config) {
   const buttons = document.querySelectorAll(UI_ELEMENTS.DIFFICULTY_BUTTON);
   buttons.forEach(button => button.classList.remove(CSS_CLASSES.ACTIVE));
@@ -411,13 +469,15 @@ document.addEventListener('DOMContentLoaded', function() {
     closeInstructionsButton.addEventListener('click', closeInstructionsDialog);
   }
 
+  bindStaticEventListeners();
+
   updateGridConfig(getDefaultDifficultyConfig());
   mainGrid = init(gridConfig.ROWS, gridConfig.COLS, gridConfig.MINES);
 
   document.addEventListener('keydown', function(event) {
     // the new game shortcut should function regardless of the game status
     if (event.key === 'Enter') {
-      mainGrid = init(gridConfig.ROWS, gridConfig.COLS, gridConfig.MINES);
+      startNewGame();
     }
 
     if (status === SYMBOLS.WON || status === SYMBOLS.GAME_OVER) {
