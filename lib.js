@@ -28,8 +28,14 @@ function partitionRandomly(size, n) {
 
 
 function generateGrid(height, width, n) {
-  const elementsByLine = partitionRandomly(height, n);
-  return Array(height).fill().map((e, i) => createRandomArrayWithNMines(width, elementsByLine[i], SYMBOLS.MINE));
+  const totalSquares = height * width;
+  const mineCount = Math.min(Math.max(0, n), totalSquares);
+  const randomSquares = createRandomArrayWithNMines(totalSquares, mineCount, SYMBOLS.MINE);
+
+  return Array.from({ length: height }, (_, rowIndex) => {
+    const rowStart = rowIndex * width;
+    return randomSquares.slice(rowStart, rowStart + width);
+  });
 }
 
 function getNeighboringSquares(grid, row, col) {
