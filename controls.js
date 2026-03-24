@@ -18,15 +18,26 @@ function closeInstructionsDialog() {
 
 function editShortcut(element, action) {
   const shortcutDialog = document.querySelector(UI_ELEMENTS.SHORTCUT_DIALOG);
+  if (shortcutDialog.open) {
+    return;
+  }
+
+  const cleanup = () => {
+    shortcutDialog.removeEventListener('keydown', handleNewShortcut);
+    shortcutDialog.removeEventListener('close', cleanup);
+    shortcutDialog.removeEventListener('cancel', cleanup);
+  };
+
+  shortcutDialog.addEventListener('keydown', handleNewShortcut, { once: true });
+  shortcutDialog.addEventListener('close', cleanup, { once: true });
+  shortcutDialog.addEventListener('cancel', cleanup, { once: true });
   shortcutDialog.showModal();
-  shortcutDialog.addEventListener('keydown', handleNewShortcut);
 
   function handleNewShortcut(event) {
     const newShortCut = event.key;
     element.innerHTML = newShortCut;
 
     saveShortcut(action, newShortCut);
-    shortcutDialog.removeEventListener('keydown', handleNewShortcut);
     shortcutDialog.close();
   }
 }
