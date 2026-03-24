@@ -216,7 +216,7 @@ function paintGrid(grid) {
         clearTimeout(longPressTimeout);
       });
 
-      if (debugMode && grid[i][j]) gridItem.innerHTML = SYMBOLS.MINE;
+      if (debugMode && grid[i][j]) gridItem.textContent = SYMBOLS.MINE;
 
       container.appendChild(gridItem);
     });
@@ -350,13 +350,13 @@ function calculateResults() {
   const date = new Date();
   const statistics = getDifficultyStatistics(gridConfig.DIFFICULTY);
   const percentage = statistics.gamesPlayed ? Math.round((statistics.gamesWon * 100) / statistics.gamesPlayed) : 0;
-  document.querySelector('.result-item:nth-child(1)').innerHTML = `Time: ${time} seconds`;
-  document.querySelector('.result-item:nth-child(2)').innerHTML = `Date: ${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-  document.querySelector('.result-item:nth-child(3)').innerHTML = `Best time: ${statistics.bestTime}`;
-  document.querySelector('.result-item:nth-child(4)').innerHTML = `Games played: ${statistics.gamesPlayed}`;
-  document.querySelector('.result-item:nth-child(5)').innerHTML = `Games won: ${statistics.gamesWon}`;
-  document.querySelector('.result-item:nth-child(6)').innerHTML = `Games percentage: ${percentage}%`;
-  document.querySelector('.best-result').innerHTML = time === statistics.bestTime
+  document.querySelector('.result-item:nth-child(1)').textContent = `Time: ${time} seconds`;
+  document.querySelector('.result-item:nth-child(2)').textContent = `Date: ${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+  document.querySelector('.result-item:nth-child(3)').textContent = `Best time: ${statistics.bestTime}`;
+  document.querySelector('.result-item:nth-child(4)').textContent = `Games played: ${statistics.gamesPlayed}`;
+  document.querySelector('.result-item:nth-child(5)').textContent = `Games won: ${statistics.gamesWon}`;
+  document.querySelector('.result-item:nth-child(6)').textContent = `Games percentage: ${percentage}%`;
+  document.querySelector('.best-result').textContent = time === statistics.bestTime
     ? 'You have the fastest time for this difficulty level'
     : '';
 }

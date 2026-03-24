@@ -7,9 +7,9 @@ const ACTIONS = {
 
 function openInstructionsDialog() {
   document.querySelector(UI_ELEMENTS.INSTRUCTIONS_DIALOG).showModal();
-  document.querySelector(UI_ELEMENTS.REVEAL_INSTRUCTION).innerHTML = getShortcut(ACTIONS.REVEAL);
-  document.querySelector(UI_ELEMENTS.FLAG_INSTRUCTION).innerHTML = getShortcut(ACTIONS.FLAG);
-  document.querySelector(UI_ELEMENTS.REVEAL_AROUND_INSTRUCTION).innerHTML = getShortcut(ACTIONS.REVEAL_AROUND);
+  document.querySelector(UI_ELEMENTS.REVEAL_INSTRUCTION).textContent = getShortcut(ACTIONS.REVEAL);
+  document.querySelector(UI_ELEMENTS.FLAG_INSTRUCTION).textContent = getShortcut(ACTIONS.FLAG);
+  document.querySelector(UI_ELEMENTS.REVEAL_AROUND_INSTRUCTION).textContent = getShortcut(ACTIONS.REVEAL_AROUND);
 }
 
 function closeInstructionsDialog() {
@@ -35,7 +35,7 @@ function editShortcut(element, action) {
 
   function handleNewShortcut(event) {
     const newShortCut = event.key;
-    element.innerHTML = newShortCut;
+    element.textContent = newShortCut;
 
     saveShortcut(action, newShortCut);
     shortcutDialog.close();
