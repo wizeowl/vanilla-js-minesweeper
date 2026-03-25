@@ -4,6 +4,9 @@
 
 body {
     font-family: "Space Mono", monospace;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .title {
@@ -335,10 +338,36 @@ body {
 }
 
 .instructions-button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
     width: fit-content;
-    padding: 4px;
-    border: 2px solid black;
+    margin-top: 20px;
+    padding: 6px 12px;
+    border: 2px solid #8d8d8d;
+    background: #c6c6c6;
+    color: #1f1f1f;
+    font: inherit;
     cursor: pointer;
+    appearance: none;
+}
+
+.instructions-button-icon {
+    width: 39px;
+    height: 39px;
+    background-image: url("assets/instructions_unpressed.svg");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    flex-shrink: 0;
+}
+
+.instructions-button:active .instructions-button-icon {
+    background-image: url("assets/instructions_pressed.svg");
+}
+
+.instructions-button-text {
+    font-size: 16px;
+    font-weight: 700;
 }
 
 .main-button:focus-visible,
@@ -363,6 +392,10 @@ body {
     .instructions-button {
         min-height: 40px;
         padding: 6px 10px;
+    }
+
+    .instructions-button {
+        gap: 10px;
     }
 }
 

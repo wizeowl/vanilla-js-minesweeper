@@ -454,7 +454,6 @@ function bindStaticEventListeners() {
   const instructionsButton = document.querySelector(UI_ELEMENTS.INSTRUCTIONS_BUTTON);
   if (instructionsButton) {
     instructionsButton.addEventListener('click', openInstructionsDialog);
-    bindKeyboardActivation(instructionsButton, openInstructionsDialog);
   }
 
   document.querySelectorAll(UI_ELEMENTS.DIFFICULTY_BUTTON).forEach((button) => {

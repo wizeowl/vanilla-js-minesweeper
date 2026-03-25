@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 39 39">
+  <rect width="39" height="39" fill="#808080"/>
+  <rect x="1" y="1" width="37" height="37" fill="#7a7a7a"/>
+  <rect x="4.5" y="4.5" width="30" height="30" fill="#c6c6c6"/>
+
+  <g transform="translate(1 1)">
+    <text
+      x="19.5"
+      y="27.5"
+      text-anchor="middle"
+      font-family="'Space Mono', monospace"
+      font-size="26"
+      font-weight="700"
+      fill="#111111"
+    >?</text>
+  </g>
+</svg>
+
