@@ -74,4 +74,19 @@ The game stores:
 
 To reset everything, clear the site's keys from your browser local storage.
 
+## Accessibility status
+
+- Landmarks and semantic sections are in place (`header`, `main`, game/results sections).
+- Main interactions are exposed through native controls (`button`) with visible focus states.
+- Game board exposes `role="grid"`, and cells are labeled dynamically for assistive tech.
+- Live announcements exist for key events (new game, flag/reveal actions, win/lose, mines counter, periodic timer updates).
+- Dialogs have accessible names/descriptions and focus return logic.
+
+Current limitation:
+- Screen reader validation is still pending on real assistive tooling (VoiceOver/NVDA/TalkBack), so some items are tracked as "code complete, validation pending".
+
+See:
+- `accessibility-audit.md`
+- `accessibility-roadmap.md`
+
 

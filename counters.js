@@ -25,8 +25,15 @@ function stopTimer() {
 
 function updateTimer() {
   updateCounter(time, timerHundreds, timerTens, timerDigits);
+  if (typeof announceStatus === 'function' && time > 0 && time % 30 === 0) {
+    announceStatus(`Timer: ${time} seconds`);
+  }
 }
 
 function updateMinesCounter() {
-  updateCounter(mines - flagged.size, minesHundreds, minesTens, minesDigits);
+  const remainingMines = mines - flagged.size;
+  updateCounter(remainingMines, minesHundreds, minesTens, minesDigits);
+  if (typeof announceStatus === 'function') {
+    announceStatus(`Mines remaining: ${remainingMines}.`);
+  }
 }

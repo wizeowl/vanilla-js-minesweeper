@@ -24,6 +24,8 @@ const UI_ELEMENTS = {
   REVEAL_AROUND_INSTRUCTION: '.instruction.REVEAL_AROUND',
   INSTRUCTIONS_BUTTON: '.instructions-button',
   SHORTCUT_INSTRUCTION: '.instruction[data-action]',
+  LIVE_STATUS: '.a11y-live-status',
+  LIVE_ALERT: '.a11y-live-alert',
 };
 
 const CSS_CLASSES = {
@@ -110,6 +112,8 @@ let minesDigits;
 let timerHundreds;
 let timerTens;
 let timerDigits;
+let liveStatusElement;
+let liveAlertElement;
 
 let lastClickTime = 0;
 let lastTouchInteractionTime = 0;
@@ -131,8 +135,67 @@ function triggerHaptic(pattern) {
   lastHapticTimestamp = now;
 }
 
+function announceToLiveRegion(element, message) {
+  if (!element || !message) {
+    return;
+  }
+
+  element.textContent = '';
+  requestAnimationFrame(() => {
+    element.textContent = message;
+  });
+}
+
+function announceStatus(message) {
+  announceToLiveRegion(liveStatusElement, message);
+}
+
+function announceAlert(message) {
+  announceToLiveRegion(liveAlertElement, message);
+}
+
+window.announceStatus = announceStatus;
+
 function getGridItem(row, col) {
   return gridItems[row]?.[col] ?? null;
+}
+
+function describeCellState(state, minesAround = null) {
+  switch (state) {
+    case 'FLAGGED':
+      return 'flagged';
+    case 'QUESTION_MARK':
+      return 'question mark';
+    case 'MINE':
+      return 'mine';
+    case 'TRIGGERED_MINE':
+      return 'triggered mine';
+    case 'REVEALED':
+      return minesAround === 0
+        ? 'revealed, empty'
+        : `revealed, ${minesAround} adjacent mines`;
+    default:
+      return 'hidden';
+  }
+}
+
+function setGridItemA11yState(row, col, state, minesAround = null) {
+  const gridItem = getGridItem(row, col);
+  if (!gridItem) {
+    return;
+  }
+
+  gridItem.setAttribute('aria-label', `Row ${row + 1}, column ${col + 1}, ${describeCellState(state, minesAround)}`);
+}
+
+function updateBoardMetadata() {
+  const gridElement = document.querySelector(UI_ELEMENTS.GRID);
+  if (!gridElement) {
+    return;
+  }
+
+  gridElement.setAttribute('aria-rowcount', String(rows));
+  gridElement.setAttribute('aria-colcount', String(cols));
 }
 
 function paintGrid(grid) {
@@ -147,6 +210,11 @@ function paintGrid(grid) {
       gridItem.classList.add(CSS_CLASSES.ITEM);
       gridItem.dataset.row = i;
       gridItem.dataset.col = j;
+      gridItem.setAttribute('role', 'gridcell');
+      gridItem.setAttribute('aria-rowindex', String(i + 1));
+      gridItem.setAttribute('aria-colindex', String(j + 1));
+      gridItem.setAttribute('tabindex', '-1');
+      setGridItemA11yState(i, j, 'HIDDEN');
 
       gridItem.addEventListener('click', () => {
         if (Date.now() - lastTouchInteractionTime < GHOST_CLICK_THRESHOLD_MS) {
@@ -239,6 +307,7 @@ function showMines(grid) {
       if (grid[i][j] === SYMBOLS.MINE) {
         const gridItem = getGridItem(i, j);
         gridItem.classList.add(CSS_CLASSES.MINE);
+        setGridItemA11yState(i, j, 'MINE');
       }
     });
   });
@@ -249,6 +318,8 @@ function showError(row, col) {
   gridItem.classList.remove(CSS_CLASSES.MINE);
   gridItem.classList.add(CSS_CLASSES.ERROR);
   mainButton.classList.add(CSS_CLASSES.GAME_OVER);
+  setGridItemA11yState(row, col, 'TRIGGERED_MINE');
+  announceAlert(`Game over. Mine triggered at row ${row + 1}, column ${col + 1}.`);
   registerLoss(gridConfig.DIFFICULTY);
   stopTimer();
 }
@@ -266,11 +337,22 @@ function annotate(grid, row, col) {
   if (hasFlag) {
     gridItem.classList.remove(CSS_CLASSES.FLAG);
     flagged.delete(key);
+    setGridItemA11yState(row, col, 'HIDDEN');
+    announceStatus(`Flag removed at row ${row + 1}, column ${col + 1}.`);
   } else if (hasQuestionMark) {
     gridItem.classList.remove(CSS_CLASSES.QUESTION_MARK);
     gridItem.classList.add(CSS_CLASSES.FLAG);
+    setGridItemA11yState(row, col, 'FLAGGED');
+    announceStatus(`Flag placed at row ${row + 1}, column ${col + 1}.`);
   } else {
     gridItem.classList.add(showQuestionMark ? CSS_CLASSES.QUESTION_MARK : CSS_CLASSES.FLAG);
+    if (showQuestionMark) {
+      setGridItemA11yState(row, col, 'QUESTION_MARK');
+      announceStatus(`Question mark placed at row ${row + 1}, column ${col + 1}.`);
+    } else {
+      setGridItemA11yState(row, col, 'FLAGGED');
+      announceStatus(`Flag placed at row ${row + 1}, column ${col + 1}.`);
+    }
   }
 
   if (gridItem.classList.contains(CSS_CLASSES.FLAG)) {
@@ -336,6 +418,10 @@ function inspect(grid, row, col, options = {}) {
   const minesAround = square.filter(([cell]) => cell === SYMBOLS.MINE).length;
   const gridItem = getGridItem(row, col);
   gridItem.classList.add('grid' + minesAround);
+  setGridItemA11yState(row, col, 'REVEALED', minesAround);
+  if (triggerRevealHaptic) {
+    announceStatus(`Revealed row ${row + 1}, column ${col + 1}: ${minesAround} adjacent mines.`);
+  }
 
   if (minesAround === 0) {
     square.forEach(([_, i, j]) => inspect(grid, i, j, { triggerRevealHaptic: false }));
@@ -352,6 +438,7 @@ function checkWin() {
     calculateResults();
     status = SYMBOLS.WON;
     mainButton.classList.add(CSS_CLASSES.GAME_WON);
+    announceAlert(`You won in ${time} seconds.`);
     stopTimer();
   }
 }
@@ -380,6 +467,7 @@ function initializeGridStyle(height, width) {
   gridElement.style.height = `calc(${height} * ${CELL_SIZE}px)`;
   gridElement.style.width = `calc(${width} * ${CELL_SIZE}px)`;
   gridContainer.style.height = `calc(${height} * ${CELL_SIZE}px)`;
+  updateBoardMetadata();
 }
 
 function getDefaultDifficultyConfig() {
@@ -399,10 +487,12 @@ function setDifficulty(config) {
   mainGrid = init(gridConfig.ROWS, gridConfig.COLS, gridConfig.MINES);
   localStorage.setItem(SYMBOLS.CONFIG, JSON.stringify(config));
   document.querySelector(UI_ELEMENTS.GRID_CONTAINER).focus();
+  announceStatus(`Difficulty set to ${config.DIFFICULTY}.`);
 }
 
 function startNewGame() {
   mainGrid = init(gridConfig.ROWS, gridConfig.COLS, gridConfig.MINES);
+  announceStatus(`New game started on ${gridConfig.DIFFICULTY} difficulty.`);
 }
 
 function getDifficultyConfig(difficulty) {
@@ -420,6 +510,10 @@ function getDifficultyConfig(difficulty) {
 
 function bindKeyboardActivation(element, callback) {
   if (!element) {
+    return;
+  }
+
+  if (element.tagName === 'BUTTON') {
     return;
   }
 
@@ -527,6 +621,8 @@ document.addEventListener('DOMContentLoaded', function() {
   timerHundreds = document.querySelector(UI_ELEMENTS.TIMER.HUNDREDS);
   timerTens = document.querySelector(UI_ELEMENTS.TIMER.TENS);
   timerDigits = document.querySelector(UI_ELEMENTS.TIMER.DIGITS);
+  liveStatusElement = document.querySelector(UI_ELEMENTS.LIVE_STATUS);
+  liveAlertElement = document.querySelector(UI_ELEMENTS.LIVE_ALERT);
   highlightElement = document.querySelector(UI_ELEMENTS.HIGHLIGHT_ELEMENT);
   const closeInstructionsButton = document.querySelector(UI_ELEMENTS.CLOSE_INSTRUCTIONS_BUTTON);
 
@@ -539,6 +635,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   updateGridConfig(getDefaultDifficultyConfig());
   mainGrid = init(gridConfig.ROWS, gridConfig.COLS, gridConfig.MINES);
+  announceStatus(`Game ready on ${gridConfig.DIFFICULTY} difficulty. Use arrow keys to navigate.`);
 
   document.addEventListener('keydown', function(event) {
     if (event.defaultPrevented || isDialogOpen()) {

@@ -1,7 +1,7 @@
-# Accessibility Audit - Phase 0 (Etat des lieux)
+# Accessibility Audit - Phase 0 (Etat post-implementation)
 
 Date: 2026-03-25
-Perimetre: `index.html`, `style.css`, `script.js`, `controls.js`
+Perimetre: `index.html`, `style.css`, `script.js`, `controls.js`, `counters.js`
 Reference: `accessibility-roadmap.md` (Phase 0)
 
 ## Methodologie
@@ -9,100 +9,74 @@ Reference: `accessibility-roadmap.md` (Phase 0)
 Checks executes:
 - Analyse statique des fichiers HTML/CSS/JS
 - Verification IDE (`get_errors`) sur les fichiers du perimetre
-- Releves structurels via recherche (`role`, `aria-*`, `tabindex`, gestion clavier/dialog)
+- Verification syntaxique JS (`node --check`)
+- Releves structurels (`aria-live`, `role="grid"`, landmarks, media queries a11y)
 
 Checks non executes dans cette passe:
 - Lighthouse Accessibility
 - axe DevTools / axe CLI
 - Tests lecteurs d'ecran en execution reelle (VoiceOver/NVDA/TalkBack)
 
-## Baseline actuelle (resume)
+## Synthese du statut
 
-Points positifs observes:
-- Attributs `alt` decoratifs presents pour les drapeaux du titre (`index.html`).
-- Plusieurs controles interactifs exposes avec `role`, `tabindex` et `aria-label` (`index.html`).
-- Focus visible defini sur les elements interactifs (`style.css`).
-- Blocage des raccourcis globaux quand un dialog est ouvert (`script.js`, `isDialogOpen`).
-- Dialogs ouverts/fermes avec API native `showModal()` / `close()` (`controls.js`).
+- **Ecarts majeurs: traites** (landmarks, grille exposee, annonces live, dialogs nommes, boutons natifs, prefs CSS systeme).
+- **P0: traites au niveau code** (modele de grille, `aria-live`, nommage dialogs).
+- **Risque residuel principal**: validation terrain avec lecteurs d'ecran reellement actifs.
 
-Ecarts majeurs observes:
-- Pas de structure landmarks (`main`, `header`, `section`) pour navigation rapide lecteur d'ecran (`index.html`).
-- Pas de modele accessible explicite pour la grille de jeu (`role="grid"`, nommage des cellules, etats annonces) (`index.html` + `script.js`).
-- Pas de regions `aria-live` pour evenements critiques (victoire/defaite, compteur, timer, statut d'action) (`index.html` + `script.js`).
-- Plusieurs elements non natifs restent en `div` avec `role="button"` (fonctionnel mais moins robuste que `button` natif) (`index.html`).
-- Dialogs sans nom accessible explicite (`aria-labelledby`/titre de dialog) (`index.html`).
-- Absence de preferences a11y systeme (`prefers-reduced-motion`, `prefers-contrast`) (`style.css`).
+## Statut des ecarts majeurs
 
-## Backlog priorise (P0 / P1 / P2)
+1. Landmarks (`main`, `header`, `section`) -> **Fait** (`index.html`)
+2. Modele accessible grille (`role="grid"`, cellules nommees) -> **Fait** (`index.html`, `script.js`)
+3. Regions `aria-live` pour statut critique -> **Fait** (`index.html`, `script.js`, `counters.js`)
+4. Elements non natifs `div[role="button"]` -> **Fait** (conversion en `button`)
+5. Dialogs nommes explicitement -> **Fait** (`aria-labelledby`, `aria-describedby`)
+6. Preferences a11y systeme (`prefers-reduced-motion`, `prefers-contrast`) -> **Fait** (`style.css`)
 
-## P0 (bloquant accessibilite fonctionnelle)
+## Backlog priorise (mis a jour)
 
-1. Ajouter un modele accessible de grille (role/etats/cellules)
-- Impact: un lecteur d'ecran ne peut pas comprendre/operer clairement la grille.
-- Cible: `index.html`, `script.js`
-- WCAG: 1.3.1, 4.1.2, 2.1.1
+## P0
 
-2. Ajouter annonces `aria-live` pour evenements critiques
-- Impact: absence de feedback non visuel sur actions et statut de partie.
-- Cible: `index.html`, `script.js`
-- WCAG: 4.1.3, 3.2.2
+1. Modele accessible de grille (role/etats/cellules) -> **Fait (code)**
+2. Annonces `aria-live` evenements critiques -> **Fait (code)**
+3. Nommage des dialogs (titre + description) -> **Fait (code)**
 
-3. Nommer correctement les dialogs (titre + description)
-- Impact: contexte incomplet lors de l'ouverture des modales.
-- Cible: `index.html`, `controls.js`
-- WCAG: 1.3.1, 4.1.2
+## P1
 
-## P1 (important UX a11y)
+4. Landmarks semantiques -> **Fait (code)**
+5. Migration vers controles natifs `button` -> **Fait (code)**
+6. Preferences CSS systeme -> **Fait (code)**
 
-4. Introduire landmarks semantiques (`main`, `header`, sections)
-- Impact: navigation assistee plus lente.
-- Cible: `index.html`
-- WCAG: 1.3.1, 2.4.1
+## P2 (reste a faire)
 
-5. Remplacer progressivement les `div[role="button"]` par des `button` natifs
-- Impact: fiabilite clavier/AT meilleure, moins de logique custom.
-- Cible: `index.html`, `script.js`
-- WCAG: 2.1.1, 4.1.2
-
-6. Ajouter preferences CSS systeme (`prefers-reduced-motion`, `prefers-contrast`)
-- Impact: inconfort potentiel pour certains utilisateurs.
-- Cible: `style.css`
-- WCAG: 1.4.3, 1.4.11, 2.3.x (bonnes pratiques)
-
-## P2 (durcissement et maintenabilite)
-
-7. Standardiser les libelles accessibles (naming guide)
-- Impact: coherence de voix UX variable.
-- Cible: docs + code
-
-8. Ajouter checklist PR accessibilite
-- Impact: risque de regression a11y dans les futures features.
-- Cible: process repo
+7. Standardiser les libelles accessibles (naming guide) -> **Restant**
+8. Ajouter checklist PR accessibilite -> **Restant**
 
 ## Grille de tests d'acceptation (Phase 0)
 
 | Scenario | Attendu | Statut actuel |
 |---|---|---|
-| Navigation clavier globale | Tous les controles principaux atteignables + focus visible | Partiel |
+| Navigation clavier globale | Tous les controles principaux atteignables + focus visible | OK |
 | Raccourcis pendant dialog ouvert | Aucun conflit avec gameplay | OK |
-| Ouverture/fermeture dialogs | Focus et fermeture clavier coherents | Partiel |
-| Lecture non visuelle de la grille | Cellules nommees + etats annonces | KO |
-| Annonces victoire/defaite | Message vocal automatique | KO |
-| Annonces compteur/timer | Feedback non visuel disponible | KO |
-| Navigation par landmarks | Regions principales identifiables | KO |
+| Ouverture/fermeture dialogs | Focus et fermeture clavier coherents | OK |
+| Lecture non visuelle de la grille | Cellules nommees + etats annonces | Partiel* |
+| Annonces victoire/defaite | Message vocal automatique | Partiel* |
+| Annonces compteur/timer | Feedback non visuel disponible | Partiel* |
+| Navigation par landmarks | Regions principales identifiables | OK |
 
-## Recommandations immediates (ordre d'execution)
+\* Partiel = present au niveau code, non valide en test lecteur d'ecran reel dans cette passe.
 
-1. Ajouter semantique grille + etats cellules (P0)
-2. Ajouter `aria-live` pour statut jeu, resultat, compteurs (P0)
-3. Nommer explicitement les dialogs (P0)
-4. Structurer la page avec landmarks (P1)
+## Prochaines actions recommandees
+
+1. Executer un run VoiceOver (macOS) sur un parcours complet (start -> reveal/flag -> win/lose).
+2. Lancer un audit axe/Lighthouse et corriger les ecarts restants.
+3. Produire la checklist PR a11y et un guide de libelles (P2).
 
 ## Trace des preuves (cette passe)
 
-- `get_errors` sur `index.html`, `style.css`, `script.js`, `controls.js`: aucune erreur remontee.
-- Recherche `aria-live|role="grid"|role="status"|role="alert"` dans `index.html`: aucune occurrence.
-- Recherche `<main|<header|<nav|<section` dans `index.html`: aucune occurrence.
-- Recherche `prefers-reduced-motion|prefers-contrast` dans `style.css`: aucune occurrence.
-- Verification de la garde clavier dialog dans `script.js`: presente (`isDialogOpen`).
+- `get_errors` sur `index.html`, `style.css`, `script.js`, `controls.js`, `counters.js`: aucune erreur.
+- `node --check` sur `script.js`, `controls.js`, `counters.js`: OK.
+- Recherche structurelle positive:
+  - `aria-live`, `role="grid"`, `aria-labelledby` dans `index.html`
+  - `header` / `main` dans `index.html`
+  - `prefers-reduced-motion` / `prefers-contrast` dans `style.css`
 

@@ -9,6 +9,26 @@ body {
     align-items: center;
 }
 
+header,
+main {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 .title {
     display: flex;
     align-items: center;
@@ -208,6 +228,9 @@ body {
     margin: 4.5px;
     width: 39px;
     height: 39px;
+    border: none;
+    padding: 0;
+    background-color: transparent;
     background-image: url("assets/face_unpressed.svg");
     background-size: 100% 100%;
     cursor: pointer;
@@ -405,6 +428,9 @@ body {
     font-size: 48px;
     top: -8px;
     cursor: pointer;
+    border: none;
+    background: transparent;
+    line-height: 1;
 }
 
 .instruction {
@@ -415,4 +441,37 @@ body {
     background-image: url("assets/closed.svg");
     background-size: 100%;
     text-align: center;
+    border: none;
+    padding: 0;
+    background-color: transparent;
+    color: #111;
+    font: inherit;
+}
+
+.grid-item-highlight {
+    border: none;
+    padding: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+@media (prefers-contrast: more) {
+    .main-button:focus-visible,
+    .grid-item-highlight:focus-visible,
+    .difficulty-controls button:focus-visible,
+    .new-game-button:focus-visible,
+    .instructions-button:focus-visible,
+    .instruction:focus-visible,
+    .close-instructions-button:focus-visible {
+        outline: 3px solid #000;
+    }
 }

@@ -6,7 +6,9 @@ const ACTIONS = {
 };
 
 function openInstructionsDialog() {
-  document.querySelector(UI_ELEMENTS.INSTRUCTIONS_DIALOG).showModal();
+  const instructionsDialog = document.querySelector(UI_ELEMENTS.INSTRUCTIONS_DIALOG);
+  instructionsDialog.showModal();
+  document.querySelector(UI_ELEMENTS.CLOSE_INSTRUCTIONS_BUTTON)?.focus();
   document.querySelector(UI_ELEMENTS.REVEAL_INSTRUCTION).textContent = getShortcut(ACTIONS.REVEAL);
   document.querySelector(UI_ELEMENTS.FLAG_INSTRUCTION).textContent = getShortcut(ACTIONS.FLAG);
   document.querySelector(UI_ELEMENTS.REVEAL_AROUND_INSTRUCTION).textContent = getShortcut(ACTIONS.REVEAL_AROUND);
@@ -14,6 +16,7 @@ function openInstructionsDialog() {
 
 function closeInstructionsDialog() {
   document.querySelector(UI_ELEMENTS.INSTRUCTIONS_DIALOG).close();
+  document.querySelector(UI_ELEMENTS.INSTRUCTIONS_BUTTON)?.focus();
 }
 
 function editShortcut(element, action) {
@@ -32,6 +35,7 @@ function editShortcut(element, action) {
   shortcutDialog.addEventListener('close', cleanup, { once: true });
   shortcutDialog.addEventListener('cancel', cleanup, { once: true });
   shortcutDialog.showModal();
+  shortcutDialog.focus();
 
   function handleNewShortcut(event) {
     const newShortCut = event.key;
