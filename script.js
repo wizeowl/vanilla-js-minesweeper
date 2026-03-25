@@ -26,6 +26,7 @@ const UI_ELEMENTS = {
   SHORTCUT_INSTRUCTION: '.instruction[data-action]',
   LIVE_STATUS: '.a11y-live-status',
   LIVE_ALERT: '.a11y-live-alert',
+  NEW_GAME_BUTTON_MODAL: '.new-game-button',
 };
 
 const CSS_CLASSES = {
@@ -121,6 +122,7 @@ let lastTap = null;
 let lastHapticTimestamp = 0;
 let gridItems = [];
 let activeCell = { row: 0, col: 0 };
+let shouldFocusInstructions = false;
 const lastAnnouncements = {
   status: { message: '', timestamp: 0 },
   alert: { message: '', timestamp: 0 },
@@ -129,6 +131,12 @@ const ANNOUNCEMENT_DEDUP_MS = 1200;
 
 function triggerHaptic(pattern) {
   if (typeof navigator === 'undefined' || typeof navigator.vibrate !== 'function') {
+    return;
+  }
+
+  // Check if haptics are enabled (defaults to true if preferences.js not loaded)
+  const hapticsEnabled = typeof isHapticsEnabled === 'function' ? isHapticsEnabled() : true;
+  if (!hapticsEnabled) {
     return;
   }
 
@@ -379,6 +387,14 @@ function showError(row, col) {
   announceAlert(`Game over. Mine triggered at row ${row + 1}, column ${col + 1}.`);
   registerLoss(gridConfig.DIFFICULTY);
   stopTimer();
+
+  const newGameBtn = document.querySelector(UI_ELEMENTS.MAIN_BUTTON);
+  if (newGameBtn) {
+    setTimeout(() => {
+      newGameBtn.focus();
+      announceStatus('Game lost. Focus on new game button.');
+    }, 100);
+  }
 }
 
 function annotate(grid, row, col) {
@@ -498,6 +514,14 @@ function checkWin() {
     mainButton.classList.add(CSS_CLASSES.GAME_WON);
     announceAlert(`You won in ${time} seconds. ${visited.size} safe cells revealed.`);
     stopTimer();
+
+    const newGameModalBtn = document.querySelector(UI_ELEMENTS.NEW_GAME_BUTTON_MODAL);
+    if (newGameModalBtn) {
+      setTimeout(() => {
+        newGameModalBtn.focus();
+        announceStatus('Game won. Focus on new game button in results.');
+      }, 100);
+    }
   }
 }
 
@@ -542,6 +566,7 @@ function getDefaultDifficultyConfig() {
 
 function setDifficulty(config) {
   updateGridConfig(config);
+  shouldFocusInstructions = true;
   mainGrid = init(gridConfig.ROWS, gridConfig.COLS, gridConfig.MINES);
   localStorage.setItem(SYMBOLS.CONFIG, JSON.stringify(config));
   document.querySelector(UI_ELEMENTS.GRID_CONTAINER).focus();
@@ -551,6 +576,15 @@ function setDifficulty(config) {
 function startNewGame() {
   mainGrid = init(gridConfig.ROWS, gridConfig.COLS, gridConfig.MINES);
   announceStatus(`New game started on ${gridConfig.DIFFICULTY} difficulty.`);
+
+  if (shouldFocusInstructions) {
+    const instructionsButton = document.querySelector(UI_ELEMENTS.INSTRUCTIONS_BUTTON);
+    if (instructionsButton) {
+      instructionsButton.focus();
+      announceStatus('Focus moved to instructions button.');
+    }
+    shouldFocusInstructions = false;
+  }
 }
 
 function getDifficultyConfig(difficulty) {

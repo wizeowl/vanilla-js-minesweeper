@@ -7,6 +7,7 @@
   <title>Classic Minesweeper</title>
   <link rel="stylesheet" href="style.css">
   <script src="lib.js"></script>
+  <script src="preferences.js"></script>
   <script src="script.js"></script>
   <script src="counters.js"></script>
   <script src="highlighter.js"></script>
@@ -32,7 +33,8 @@
         <div class="number d0 mines-tens"></div>
         <div class="number d0 mines-digits"></div>
       </div>
-      <button type="button" class="main-button" aria-label="Start a new game"></button>
+      <button type="button" class="main-button" aria-label="Start a new game" tabindex="1"></button>
+      <!-- Tab order: 1. new game button -->
       <div class="numbers-panel timer">
         <div class="number d0 timer-hundreds"></div>
         <div class="number d0 timer-tens"></div>
@@ -52,11 +54,12 @@
   <div class="bottom-panel">
     <div class="vertical-bar"></div>
     <div class="difficulty-controls">
-      <button type="button" data-difficulty="BEGINNER">Beginner</button>
-      <button type="button" data-difficulty="INTERMEDIATE">
+      <!-- Tab order: 4. Difficulty buttons -->
+      <button type="button" data-difficulty="BEGINNER" tabindex="4">Beginner</button>
+      <button type="button" data-difficulty="INTERMEDIATE" tabindex="4">
         Intermediate
       </button>
-      <button type="button" data-difficulty="EXPERT">Expert</button>
+      <button type="button" data-difficulty="EXPERT" tabindex="4">Expert</button>
     </div>
     <div class="vertical-bar"></div>
   </div>
@@ -93,10 +96,15 @@
   <div class="bar bottom-bar"></div>
 </section>
 
-<button type="button" class="instructions-button" aria-label="Open keyboard instructions">
-  <span class="instructions-button-icon" aria-hidden="true"></span>
-  <span class="instructions-button-text">Instructions for Keyboard Gameplay</span>
-</button>
+<div class="utility-controls" aria-label="Game utilities">
+  <!-- Tab order: 2. Instructions button -->
+  <button type="button" class="instructions-button" aria-label="Open keyboard instructions" tabindex="2">
+    <span class="instructions-button-text">Instructions for Keyboard Gameplay</span>
+  </button>
+  <button type="button" class="preferences-button" aria-label="Open accessibility preferences" tabindex="3">
+    <span class="preferences-button-text">Preferences</span>
+  </button>
+</div>
 <dialog class="instruction-dialog" aria-labelledby="instruction-dialog-title" aria-describedby="instruction-dialog-description">
   <button type="button" class="close-instructions-button" aria-label="Close instructions">&times;</button>
   <h2 id="instruction-dialog-title">Instructions for Keyboard Gameplay</h2>
@@ -146,6 +154,24 @@
         </ul>
       </li>
     </ol>
+  </div>
+</dialog>
+
+<dialog class="preferences-dialog" aria-labelledby="preferences-dialog-title" aria-describedby="preferences-dialog-description">
+  <button type="button" class="close-preferences-button" aria-label="Close preferences">&times;</button>
+  <h2 id="preferences-dialog-title">Accessibility preferences</h2>
+  <p id="preferences-dialog-description">Adjust haptics and announcement verbosity.</p>
+  <div class="preferences-content">
+    <label class="preferences-field">
+      <input type="checkbox" class="preference-haptics-toggle">
+      Enable haptic feedback when supported
+    </label>
+
+    <label class="preferences-field" for="announcement-level-select">Announcement level</label>
+    <select id="announcement-level-select" class="preference-announcement-level">
+      <option value="normal">Normal</option>
+      <option value="verbose">Verbose</option>
+    </select>
   </div>
 </dialog>
 

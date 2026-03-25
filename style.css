@@ -1,5 +1,6 @@
 :root {
     --cell-size: 23px;
+    --utility-button-width: min(360px, calc(100vw - 32px));
 }
 
 body {
@@ -310,11 +311,15 @@ main {
 }
 
 .results {
-    position: absolute;
-    top: 80px;
-    left: 60px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     font-size: 13px;
     display: none;
+    width: max-content;
+    max-width: calc(100vw - 24px);
+    z-index: 20;
 }
 
 .game-container:has(.main-button.game-won) ~ .results {
@@ -331,12 +336,20 @@ main {
 
 .results-panel {
     display: flex;
-    height: 300px;
+    align-items: stretch;
+    min-height: 300px;
+}
+
+.results-panel .vertical-bar {
+    height: auto;
+    align-self: stretch;
+    flex-shrink: 0;
 }
 
 .result-details {
     background: silver;
     padding: 20px;
+    min-width: min(420px, calc(100vw - 72px));
 }
 
 .result-items {
@@ -353,26 +366,59 @@ main {
     grid-column: 1 / -1;
 }
 
-.new-game-button {
-    border-radius: 4px;
+.new-game-button,
+.instructions-button,
+.preferences-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 12px 18px;
+    border: none;
+    background-color: transparent;
+    background-image: url("assets/button_wide_unpressed.svg");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    box-sizing: border-box;
     cursor: pointer;
-    font-size: 14px;
-    padding: 4px 8px;
+    color: #1f1f1f;
+    font: inherit;
+    font-weight: 700;
+    line-height: 1.1;
+    appearance: none;
+}
+
+.new-game-button:active,
+.instructions-button:active,
+.preferences-button:active {
+    background-image: url("assets/button_wide_pressed.svg");
+    transform: translate(1px, 1px);
+}
+
+.utility-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 20px;
+    align-items: stretch;
+    justify-content: center;
+}
+
+.new-game-button {
+    min-width: 140px;
 }
 
 .instructions-button {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: fit-content;
-    margin-top: 20px;
-    padding: 6px 12px;
-    border: 2px solid #8d8d8d;
-    background: #c6c6c6;
-    color: #1f1f1f;
-    font: inherit;
-    cursor: pointer;
-    appearance: none;
+    width: var(--utility-button-width);
+    max-width: 100%;
+    padding-inline: 16px;
+}
+
+.preferences-button {
+    width: var(--utility-button-width);
+    max-width: 100%;
+    padding-inline: 16px;
 }
 
 .instructions-button-icon {
@@ -388,9 +434,86 @@ main {
     background-image: url("assets/instructions_pressed.svg");
 }
 
-.instructions-button-text {
+.instructions-button-text,
+.preferences-button-text {
     font-size: 16px;
     font-weight: 700;
+}
+
+.instructions-button-text {
+    display: block;
+    width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: center;
+}
+
+.preferences-button-text {
+    display: block;
+    width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: center;
+}
+
+.preferences-button-icon {
+    width: 39px;
+    height: 39px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 28px;
+    line-height: 1;
+}
+
+
+.instruction-dialog,
+.preferences-dialog,
+.shortcut-dialog {
+    position: relative;
+    max-width: min(560px, calc(100vw - 32px));
+    padding: 24px;
+    padding-right: 72px;
+    border: 2px solid #000;
+    background: #c0c0c0;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.35);
+}
+
+.instruction-dialog::backdrop,
+.preferences-dialog::backdrop,
+.shortcut-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.25);
+}
+
+.instruction-dialog h2,
+.preferences-dialog h2,
+.shortcut-dialog h2 {
+    margin: 0 0 12px;
+}
+
+.instruction-dialog p,
+.preferences-dialog p,
+.shortcut-dialog p {
+    margin-top: 0;
+}
+
+.preferences-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: min(320px, calc(100vw - 80px));
+}
+
+.preferences-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.preference-announcement-level {
+    font: inherit;
+    padding: 6px 8px;
 }
 
 .main-button:focus-visible,
@@ -398,8 +521,11 @@ main {
 .difficulty-controls button:focus-visible,
 .new-game-button:focus-visible,
 .instructions-button:focus-visible,
+.preferences-button:focus-visible,
 .instruction:focus-visible,
-.close-instructions-button:focus-visible {
+.close-instructions-button:focus-visible,
+.close-preferences-button:focus-visible,
+.preference-announcement-level:focus-visible {
     outline: 2px solid #005fcc;
     outline-offset: 2px;
 }
@@ -412,25 +538,61 @@ main {
 
     .difficulty-controls button,
     .new-game-button,
-    .instructions-button {
-        min-height: 40px;
-        padding: 6px 10px;
+    .instructions-button,
+    .preferences-button {
+        min-height: 44px;
+        padding: 8px 12px;
     }
 
-    .instructions-button {
+    .instructions-button,
+    .preferences-button {
         gap: 10px;
+        min-height: 48px;
+    }
+
+    .main-button {
+        width: 48px;
+        height: 48px;
+    }
+
+    /* Ensure grid cells are at least 44x44px on touch devices */
+    .grid-item {
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
+    }
+
+    .grid-item-highlight {
+        width: 32px;
+        height: 32px;
     }
 }
 
-.close-instructions-button {
+.close-instructions-button,
+.close-preferences-button {
     position: absolute;
-    right: 14px;
-    font-size: 48px;
-    top: -8px;
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 26px;
     cursor: pointer;
     border: none;
-    background: transparent;
+    background-color: transparent;
+    background-image: url("assets/button_unpressed.svg");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
     line-height: 1;
+}
+
+.close-instructions-button:active,
+.close-preferences-button:active {
+    background-image: url("assets/button_pressed.svg");
+    transform: translate(1px, 1px);
 }
 
 .instruction {
@@ -464,14 +626,65 @@ main {
     }
 }
 
+/* Zoom and reflow support - ensure readability at 200% zoom */
+@media (max-width: 960px) {
+    .grid-item {
+        font-size: 10px;
+    }
+
+    .result-details {
+        padding: 12px;
+        min-width: min(360px, calc(100vw - 48px));
+    }
+}
+
+@media (max-width: 600px) {
+    .grid-item {
+        font-size: 9px;
+    }
+
+    .instructions-button {
+        padding-inline: 14px;
+    }
+
+    .instructions-button,
+    .preferences-button {
+        width: calc(100vw - 24px);
+        padding-inline: 14px;
+    }
+
+    .results-panel {
+        height: auto;
+    }
+
+    .result-details {
+        padding: 8px;
+    }
+
+    .results {
+        width: calc(100vw - 16px);
+    }
+
+    .instruction-dialog,
+    .preferences-dialog,
+    .shortcut-dialog {
+        width: calc(100vw - 16px);
+        padding: 20px;
+        padding-right: 60px;
+    }
+}
+
 @media (prefers-contrast: more) {
     .main-button:focus-visible,
     .grid-item-highlight:focus-visible,
     .difficulty-controls button:focus-visible,
     .new-game-button:focus-visible,
     .instructions-button:focus-visible,
+    .preferences-button:focus-visible,
     .instruction:focus-visible,
-    .close-instructions-button:focus-visible {
+    .close-instructions-button:focus-visible,
+    .close-preferences-button:focus-visible,
+    .preference-announcement-level:focus-visible {
         outline: 3px solid #000;
     }
 }
