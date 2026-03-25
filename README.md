@@ -79,6 +79,7 @@ To reset everything, clear the site's keys from your browser local storage.
 - Landmarks and semantic sections are in place (`header`, `main`, game/results sections).
 - Main interactions are exposed through native controls (`button`) with visible focus states.
 - Game board exposes `role="grid"`, and cells are labeled dynamically for assistive tech.
+- Keyboard grid navigation now keeps an active cell (`tabindex` roving) and arrow keys do not scroll the page.
 - Live announcements exist for key events (new game, flag/reveal actions, win/lose, mines counter, periodic timer updates).
 - Dialogs have accessible names/descriptions and focus return logic.
 

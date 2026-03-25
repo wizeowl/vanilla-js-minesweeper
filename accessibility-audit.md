@@ -21,6 +21,7 @@ Checks non executes dans cette passe:
 
 - **Ecarts majeurs: traites** (landmarks, grille exposee, annonces live, dialogs nommes, boutons natifs, prefs CSS systeme).
 - **P0: traites au niveau code** (modele de grille, `aria-live`, nommage dialogs).
+- **Phase suivante (clavier grille): majoritairement implementee** (cellule active, `tabindex` roving, fleches sans scroll).
 - **Risque residuel principal**: validation terrain avec lecteurs d'ecran reellement actifs.
 
 ## Statut des ecarts majeurs
@@ -56,6 +57,7 @@ Checks non executes dans cette passe:
 | Scenario | Attendu | Statut actuel |
 |---|---|---|
 | Navigation clavier globale | Tous les controles principaux atteignables + focus visible | OK |
+| Navigation clavier dans la grille | Cellule active synchronisee + deplacement fleches sans scroll page | OK |
 | Raccourcis pendant dialog ouvert | Aucun conflit avec gameplay | OK |
 | Ouverture/fermeture dialogs | Focus et fermeture clavier coherents | OK |
 | Lecture non visuelle de la grille | Cellules nommees + etats annonces | Partiel* |

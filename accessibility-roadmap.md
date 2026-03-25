@@ -23,7 +23,7 @@ Ce document definit un plan par phases pour rendre le jeu conforme a **WCAG 2.2 
 
 - Phase 0: **Fait (code + audit statique)**
 - Phase 1: **Majoritairement faite** (landmarks, boutons natifs, focus-visible)
-- Phase 2: **Partiellement faite** (garde raccourcis dialogs, navigation clavier existante)
+- Phase 2: **Majoritairement faite** (garde raccourcis dialogs, navigation clavier, cellule active synchronisee)
 - Phase 3: **Partiellement faite** (regions `aria-live` + annonces d'evenements)
 - Phase 4: **Partiellement faite** (support tactile de base)
 - Phase 5: **A faire** (gouvernance, checklist PR, anti-regression)

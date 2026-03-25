@@ -120,6 +120,7 @@ let lastTouchInteractionTime = 0;
 let lastTap = null;
 let lastHapticTimestamp = 0;
 let gridItems = [];
+let activeCell = { row: 0, col: 0 };
 
 function triggerHaptic(pattern) {
   if (typeof navigator === 'undefined' || typeof navigator.vibrate !== 'function') {
@@ -198,6 +199,29 @@ function updateBoardMetadata() {
   gridElement.setAttribute('aria-colcount', String(cols));
 }
 
+function updateActiveCell(shouldFocus = false) {
+  const previous = getGridItem(activeCell.row, activeCell.col);
+  if (previous) {
+    previous.setAttribute('tabindex', '-1');
+    previous.setAttribute('aria-selected', 'false');
+  }
+
+  const next = getGridItem(highlightY, highlightX);
+  if (!next) {
+    return;
+  }
+
+  activeCell = { row: highlightY, col: highlightX };
+  next.setAttribute('tabindex', '0');
+  next.setAttribute('aria-selected', 'true');
+
+  highlightElement.setAttribute('aria-label', `Reveal selected cell at row ${highlightY + 1}, column ${highlightX + 1}`);
+
+  if (shouldFocus && !isDialogOpen()) {
+    next.focus({ preventScroll: true });
+  }
+}
+
 function paintGrid(grid) {
   const container = document.querySelector(UI_ELEMENTS.GRID);
   container.innerHTML = '';
@@ -217,6 +241,11 @@ function paintGrid(grid) {
       setGridItemA11yState(i, j, 'HIDDEN');
 
       gridItem.addEventListener('click', () => {
+        highlightX = j;
+        highlightY = i;
+        renderHighlight();
+        updateActiveCell(false);
+
         if (Date.now() - lastTouchInteractionTime < GHOST_CLICK_THRESHOLD_MS) {
           return;
         }
@@ -240,6 +269,10 @@ function paintGrid(grid) {
 
       gridItem.addEventListener('contextmenu', (event) => {
         event.preventDefault();
+        highlightX = j;
+        highlightY = i;
+        renderHighlight();
+        updateActiveCell(false);
         annotate(grid, i, j);
       });
 
@@ -248,6 +281,10 @@ function paintGrid(grid) {
 
       gridItem.addEventListener('touchstart', (event) => {
         event.preventDefault();
+        highlightX = j;
+        highlightY = i;
+        renderHighlight();
+        updateActiveCell(false);
         longPressTriggered = false;
 
         longPressTimeout = setTimeout(() => {
@@ -609,6 +646,7 @@ function init(numRows, numCols, numMines) {
 
   initializeGridStyle(rows, cols);
   paintGrid(grid);
+  updateActiveCell(false);
 
   return grid;
 }
@@ -653,16 +691,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
     switch (event.key) {
       case 'ArrowLeft':
+        event.preventDefault();
         moveHighlight(-1, 0, gridConfig.ROWS - 1, gridConfig.COLS - 1);
+        updateActiveCell(true);
         break;
       case 'ArrowUp':
+        event.preventDefault();
         moveHighlight(0, -1, gridConfig.ROWS - 1, gridConfig.COLS - 1);
+        updateActiveCell(true);
         break;
       case 'ArrowRight':
+        event.preventDefault();
         moveHighlight(1, 0, gridConfig.ROWS - 1, gridConfig.COLS - 1);
+        updateActiveCell(true);
         break;
       case 'ArrowDown':
+        event.preventDefault();
         moveHighlight(0, 1, gridConfig.ROWS - 1, gridConfig.COLS - 1);
+        updateActiveCell(true);
         break;
       case getShortcut(ACTIONS.FLAG):
         annotate(mainGrid, highlightY, highlightX);
