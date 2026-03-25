@@ -121,6 +121,11 @@ let lastTap = null;
 let lastHapticTimestamp = 0;
 let gridItems = [];
 let activeCell = { row: 0, col: 0 };
+const lastAnnouncements = {
+  status: { message: '', timestamp: 0 },
+  alert: { message: '', timestamp: 0 },
+};
+const ANNOUNCEMENT_DEDUP_MS = 1200;
 
 function triggerHaptic(pattern) {
   if (typeof navigator === 'undefined' || typeof navigator.vibrate !== 'function') {
@@ -148,14 +153,29 @@ function announceToLiveRegion(element, message) {
 }
 
 function announceStatus(message) {
+  const now = Date.now();
+  if (lastAnnouncements.status.message === message && now - lastAnnouncements.status.timestamp < ANNOUNCEMENT_DEDUP_MS) {
+    return;
+  }
+
+  lastAnnouncements.status.message = message;
+  lastAnnouncements.status.timestamp = now;
   announceToLiveRegion(liveStatusElement, message);
 }
 
 function announceAlert(message) {
+  const now = Date.now();
+  if (lastAnnouncements.alert.message === message && now - lastAnnouncements.alert.timestamp < ANNOUNCEMENT_DEDUP_MS) {
+    return;
+  }
+
+  lastAnnouncements.alert.message = message;
+  lastAnnouncements.alert.timestamp = now;
   announceToLiveRegion(liveAlertElement, message);
 }
 
 window.announceStatus = announceStatus;
+window.announceAlert = announceAlert;
 
 function getGridItem(row, col) {
   return gridItems[row]?.[col] ?? null;
@@ -411,6 +431,7 @@ function inspectNeighborhood(grid, row, col) {
   const neighboringFlags = neighboringSquares.filter(([_, i, j]) => flagged.has(`${i}, ${j}`)).length;
 
   if (neighboringFlags === minesAround) {
+    announceStatus(`Reveal around row ${row + 1}, column ${col + 1}.`);
     triggerHaptic(HAPTIC_PATTERNS.REVEAL);
     neighboringSquares.forEach(([_, i, j]) => {
       if (!flagged.has(`${i}, ${j}`)) {
@@ -475,7 +496,7 @@ function checkWin() {
     calculateResults();
     status = SYMBOLS.WON;
     mainButton.classList.add(CSS_CLASSES.GAME_WON);
-    announceAlert(`You won in ${time} seconds.`);
+    announceAlert(`You won in ${time} seconds. ${visited.size} safe cells revealed.`);
     stopTimer();
   }
 }

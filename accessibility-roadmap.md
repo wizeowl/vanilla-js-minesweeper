@@ -24,11 +24,25 @@ Ce document definit un plan par phases pour rendre le jeu conforme a **WCAG 2.2 
 - Phase 0: **Fait (code + audit statique)**
 - Phase 1: **Majoritairement faite** (landmarks, boutons natifs, focus-visible)
 - Phase 2: **Majoritairement faite** (garde raccourcis dialogs, navigation clavier, cellule active synchronisee)
-- Phase 3: **Partiellement faite** (regions `aria-live` + annonces d'evenements)
+- Phase 3: **Majoritairement faite** (regions `aria-live`, annonces gameplay/dialogs, dedup anti-spam)
 - Phase 4: **Partiellement faite** (support tactile de base)
 - Phase 5: **A faire** (gouvernance, checklist PR, anti-regression)
 
 Note: les validations outillees (`axe`, Lighthouse) et les campagnes lecteurs d'ecran restent a executer pour valider les statuts "Partiel" en "Fait".
+
+## Matrice d'annonces (Phase 3)
+
+| Evenement UI | Canal | Message attendu |
+|---|---|---|
+| Nouvelle partie | `status` | Difficulty + demarrage |
+| Reveal cellule | `status` | Ligne/colonne + mines adjacentes |
+| Flag/unflag | `status` | Ligne/colonne + action |
+| Reveal around | `status` | Action autour de la cellule courante |
+| Explosion mine | `alert` | Game over + position |
+| Victoire | `alert` | Temps + progression |
+| Timer periodique | `status` | Toutes les 30 secondes |
+| Ouverture/fermeture dialogs | `status` | Etat du dialog |
+| Edition raccourci | `status` | Action + nouvelle touche |
 
 ---
 

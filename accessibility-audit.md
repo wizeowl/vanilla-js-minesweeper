@@ -22,7 +22,8 @@ Checks non executes dans cette passe:
 - **Ecarts majeurs: traites** (landmarks, grille exposee, annonces live, dialogs nommes, boutons natifs, prefs CSS systeme).
 - **P0: traites au niveau code** (modele de grille, `aria-live`, nommage dialogs).
 - **Phase suivante (clavier grille): majoritairement implementee** (cellule active, `tabindex` roving, fleches sans scroll).
-- **Risque residuel principal**: validation terrain avec lecteurs d'ecran reellement actifs.
+- **Phase 3 (lecteurs d'ecran): majoritairement implementee** (annonces gameplay + dialogs + dedup anti-spam).
+- **Risque residuel principal**: validation terrain avec lecteurs d'ecran reellement actifs + audit axe/Lighthouse.
 
 ## Statut des ecarts majeurs
 
@@ -60,12 +61,12 @@ Checks non executes dans cette passe:
 | Navigation clavier dans la grille | Cellule active synchronisee + deplacement fleches sans scroll page | OK |
 | Raccourcis pendant dialog ouvert | Aucun conflit avec gameplay | OK |
 | Ouverture/fermeture dialogs | Focus et fermeture clavier coherents | OK |
-| Lecture non visuelle de la grille | Cellules nommees + etats annonces | Partiel* |
-| Annonces victoire/defaite | Message vocal automatique | Partiel* |
-| Annonces compteur/timer | Feedback non visuel disponible | Partiel* |
+| Lecture non visuelle de la grille | Cellules nommees + etats annonces | OK (code) |
+| Annonces victoire/defaite | Message vocal automatique | OK (code) |
+| Annonces compteur/timer | Feedback non visuel disponible | OK (code) |
 | Navigation par landmarks | Regions principales identifiables | OK |
 
-\* Partiel = present au niveau code, non valide en test lecteur d'ecran reel dans cette passe.
+\* Les statuts "OK (code)" signifient implementation presente et verifiee statiquement, avec validation lecteur d'ecran reel encore necessaire.
 
 ## Prochaines actions recommandees
 

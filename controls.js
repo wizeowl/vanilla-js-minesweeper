@@ -12,11 +12,17 @@ function openInstructionsDialog() {
   document.querySelector(UI_ELEMENTS.REVEAL_INSTRUCTION).textContent = getShortcut(ACTIONS.REVEAL);
   document.querySelector(UI_ELEMENTS.FLAG_INSTRUCTION).textContent = getShortcut(ACTIONS.FLAG);
   document.querySelector(UI_ELEMENTS.REVEAL_AROUND_INSTRUCTION).textContent = getShortcut(ACTIONS.REVEAL_AROUND);
+  if (typeof announceStatus === 'function') {
+    announceStatus('Instructions dialog opened.');
+  }
 }
 
 function closeInstructionsDialog() {
   document.querySelector(UI_ELEMENTS.INSTRUCTIONS_DIALOG).close();
   document.querySelector(UI_ELEMENTS.INSTRUCTIONS_BUTTON)?.focus();
+  if (typeof announceStatus === 'function') {
+    announceStatus('Instructions dialog closed.');
+  }
 }
 
 function editShortcut(element, action) {
@@ -36,12 +42,18 @@ function editShortcut(element, action) {
   shortcutDialog.addEventListener('cancel', cleanup, { once: true });
   shortcutDialog.showModal();
   shortcutDialog.focus();
+  if (typeof announceStatus === 'function') {
+    announceStatus('Shortcut editor opened. Press a key.');
+  }
 
   function handleNewShortcut(event) {
     const newShortCut = event.key;
     element.textContent = newShortCut;
 
     saveShortcut(action, newShortCut);
+    if (typeof announceStatus === 'function') {
+      announceStatus(`${action} shortcut set to ${newShortCut}.`);
+    }
     shortcutDialog.close();
   }
 }
