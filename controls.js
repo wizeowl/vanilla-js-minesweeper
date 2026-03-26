@@ -5,8 +5,19 @@ const ACTIONS = {
   FLAG: 'FLAG',
 };
 
+let instructionsDialogReturnFocusElement = null;
+let shortcutDialogReturnFocusElement = null;
+
 function openInstructionsDialog() {
   const instructionsDialog = document.querySelector(UI_ELEMENTS.INSTRUCTIONS_DIALOG);
+  if (!instructionsDialog || instructionsDialog.open) {
+    return;
+  }
+
+  instructionsDialogReturnFocusElement = document.activeElement instanceof HTMLElement
+    ? document.activeElement
+    : document.querySelector(UI_ELEMENTS.INSTRUCTIONS_BUTTON);
+
   instructionsDialog.showModal();
   document.querySelector(UI_ELEMENTS.CLOSE_INSTRUCTIONS_BUTTON)?.focus();
   document.querySelector(UI_ELEMENTS.REVEAL_INSTRUCTION).textContent = getShortcut(ACTIONS.REVEAL);
@@ -18,8 +29,14 @@ function openInstructionsDialog() {
 }
 
 function closeInstructionsDialog() {
-  document.querySelector(UI_ELEMENTS.INSTRUCTIONS_DIALOG).close();
-  document.querySelector(UI_ELEMENTS.INSTRUCTIONS_BUTTON)?.focus();
+  const instructionsDialog = document.querySelector(UI_ELEMENTS.INSTRUCTIONS_DIALOG);
+  if (!instructionsDialog?.open) {
+    return;
+  }
+
+  instructionsDialog.close();
+  (instructionsDialogReturnFocusElement ?? document.querySelector(UI_ELEMENTS.INSTRUCTIONS_BUTTON))?.focus?.();
+  instructionsDialogReturnFocusElement = null;
   if (typeof announceStatus === 'function') {
     announceStatus('Instructions dialog closed.');
   }
@@ -30,6 +47,8 @@ function editShortcut(element, action) {
   if (shortcutDialog.open) {
     return;
   }
+
+  shortcutDialogReturnFocusElement = element;
 
   const cleanup = () => {
     shortcutDialog.removeEventListener('keydown', handleNewShortcut);
@@ -55,6 +74,8 @@ function editShortcut(element, action) {
       announceStatus(`${action} shortcut set to ${newShortCut}.`);
     }
     shortcutDialog.close();
+    shortcutDialogReturnFocusElement?.focus?.();
+    shortcutDialogReturnFocusElement = null;
   }
 }
 

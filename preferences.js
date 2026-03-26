@@ -22,6 +22,8 @@ const PREFERENCE_UI = {
   ANNOUNCEMENT_LEVEL: '.preference-announcement-level',
 };
 
+let preferencesDialogReturnFocusElement = null;
+
 /**
  * Get user preference with fallback to default
  * @param {string} key - Preference key (from PREFERENCES)
@@ -126,6 +128,10 @@ function openPreferencesDialog() {
     return;
   }
 
+  preferencesDialogReturnFocusElement = document.activeElement instanceof HTMLElement
+    ? document.activeElement
+    : document.querySelector(PREFERENCE_UI.BUTTON);
+
   syncPreferencesUi();
   dialog.showModal();
   document.querySelector(PREFERENCE_UI.CLOSE_BUTTON)?.focus();
@@ -142,7 +148,8 @@ function closePreferencesDialog() {
   }
 
   dialog.close();
-  document.querySelector(PREFERENCE_UI.BUTTON)?.focus();
+  (preferencesDialogReturnFocusElement ?? document.querySelector(PREFERENCE_UI.BUTTON))?.focus?.();
+  preferencesDialogReturnFocusElement = null;
 
   if (typeof announceStatus === 'function') {
     announceStatus('Preferences dialog closed.');
@@ -165,14 +172,9 @@ function bindPreferencesUi() {
   preferencesButton.addEventListener('click', openPreferencesDialog);
   closePreferencesButton?.addEventListener('click', closePreferencesDialog);
 
-  preferencesDialog.addEventListener('close', () => {
-    document.querySelector(PREFERENCE_UI.BUTTON)?.focus();
-  });
-
-  preferencesDialog.addEventListener('cancel', () => {
-    if (typeof announceStatus === 'function') {
-      announceStatus('Preferences dialog closed.');
-    }
+  preferencesDialog.addEventListener('cancel', (event) => {
+    event.preventDefault();
+    closePreferencesDialog();
   });
 
   hapticsToggle?.addEventListener('change', (event) => {

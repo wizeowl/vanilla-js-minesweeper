@@ -15,65 +15,80 @@
   <script src="controls.js"></script>
 </head>
 <body>
+<nav class="quick-access" aria-label="Quick access">
+  <a href="#main-game-button" data-focus-target="#main-game-button">Skip to new game</a>
+  <a href="#instructions-button" data-focus-target="#instructions-button">Skip to instructions</a>
+  <a href="#preferences-button" data-focus-target="#preferences-button">Skip to preferences</a>
+  <a href="#difficulty-beginner" data-focus-target="#difficulty-beginner">Skip to difficulty</a>
+  <a href="#game-board" data-focus-target="board">Skip to game board</a>
+</nav>
 <header>
   <h1 class="title"><img src="assets/flag.svg" alt="" aria-hidden="true"> Classic minesweeper <img src="assets/flag.svg" alt="" aria-hidden="true"></h1>
 </header>
 
-<main>
+<main id="main-content">
   <div class="sr-only a11y-live-status" role="status" aria-live="polite" aria-atomic="true"></div>
   <div class="sr-only a11y-live-alert" role="alert" aria-live="assertive" aria-atomic="true"></div>
 
   <section class="game-container" aria-label="Minesweeper game">
-  <div class="bar top-bar"></div>
-  <div class="top-panel">
-    <div class="vertical-bar"></div>
-    <div class="top-controls">
-      <div class="numbers-panel mine_counter">
-        <div class="number d0 mines-hundreds"></div>
-        <div class="number d0 mines-tens"></div>
-        <div class="number d0 mines-digits"></div>
+    <div class="game-shell">
+      <div class="bar top-bar"></div>
+      <div class="top-panel">
+        <div class="vertical-bar"></div>
+        <div class="top-controls">
+          <div class="numbers-panel mine_counter">
+            <div class="number d0 mines-hundreds"></div>
+            <div class="number d0 mines-tens"></div>
+            <div class="number d0 mines-digits"></div>
+          </div>
+          <button type="button" id="main-game-button" class="main-button" aria-label="Start a new game"></button>
+          <div class="numbers-panel timer">
+            <div class="number d0 timer-hundreds"></div>
+            <div class="number d0 timer-tens"></div>
+            <div class="number d0 timer-digits"></div>
+          </div>
+        </div>
+        <div class="vertical-bar"></div>
       </div>
-      <button type="button" class="main-button" aria-label="Start a new game" tabindex="1"></button>
-      <!-- Tab order: 1. new game button -->
-      <div class="numbers-panel timer">
-        <div class="number d0 timer-hundreds"></div>
-        <div class="number d0 timer-tens"></div>
-        <div class="number d0 timer-digits"></div>
+      <div class="bar"></div>
+      <div class="grid-container">
+        <div class="vertical-bar"></div>
+        <button type="button" class="grid-item-highlight" aria-label="Reveal selected cell" tabindex="-1"></button>
+        <div id="game-board" class="grid" role="grid" aria-label="Minesweeper game board" tabindex="-1"></div>
+        <div class="vertical-bar"></div>
       </div>
+      <div class="bar"></div>
     </div>
-    <div class="vertical-bar"></div>
-  </div>
-  <div class="bar"></div>
-  <div class="grid-container">
-    <div class="vertical-bar"></div>
-    <button type="button" class="grid-item-highlight" aria-label="Reveal selected cell"></button>
-    <div class="grid" role="grid" aria-label="Minesweeper game board"></div>
-    <div class="vertical-bar"></div>
-  </div>
-  <div class="bar"></div>
-  <div class="bottom-panel">
-    <div class="vertical-bar"></div>
-    <div class="difficulty-controls">
-      <!-- Tab order: 4. Difficulty buttons -->
-      <button type="button" data-difficulty="BEGINNER" tabindex="4">Beginner</button>
-      <button type="button" data-difficulty="INTERMEDIATE" tabindex="4">
-        Intermediate
+
+    <div class="utility-controls" role="group" aria-label="Game utilities">
+      <button type="button" id="instructions-button" class="instructions-button" aria-label="Open keyboard instructions">
+        <span class="instructions-button-text">Instructions for Keyboard Gameplay</span>
       </button>
-      <button type="button" data-difficulty="EXPERT" tabindex="4">Expert</button>
+      <button type="button" id="preferences-button" class="preferences-button" aria-label="Open accessibility preferences">
+        <span class="preferences-button-text">Preferences</span>
+      </button>
     </div>
-    <div class="vertical-bar"></div>
-  </div>
-  <div class="bar bottom-bar"></div>
 
-</section>
+    <div class="game-footer-shell">
+      <div id="difficulty-controls" class="difficulty-controls" role="group" aria-label="Game difficulty">
+        <button type="button" id="difficulty-beginner" class="difficulty-button" data-difficulty="BEGINNER" aria-pressed="false">Beginner</button>
+        <button type="button" class="difficulty-button" data-difficulty="INTERMEDIATE" aria-pressed="false">
+          Intermediate
+        </button>
+        <button type="button" class="difficulty-button" data-difficulty="EXPERT" aria-pressed="false">Expert</button>
+      </div>
+    </div>
+  </section>
 
-<section class="results" aria-live="polite" aria-atomic="true" aria-label="Game results">
+<dialog class="results-dialog" aria-labelledby="results-dialog-title" aria-describedby="results-dialog-description" aria-modal="true">
+  <button type="button" class="close-results-button" aria-label="Close results">&times;</button>
   <div class="bar top-bar"></div>
   <div class="results-panel">
     <div class="vertical-bar"></div>
     <div class="result-details">
-      <div class="results-subtitle">Congratulations: You won the game!</div>
-      <div class="results-subtitle best-result"></div>
+      <h2 id="results-dialog-title" class="results-subtitle">Congratulations: You won the game!</h2>
+      <p id="results-dialog-description" class="sr-only">Review your results and start a new game, or close this dialog to return to the board.</p>
+      <div class="results-subtitle best-result" aria-live="polite" aria-atomic="true"></div>
       <div class="result-items">
         <div class="result-item">Time: 42 seconds</div>
         <div class="result-item">Date: 11/11/2009</div>
@@ -94,18 +109,8 @@
     <div class="vertical-bar"></div>
   </div>
   <div class="bar bottom-bar"></div>
-</section>
-
-<div class="utility-controls" aria-label="Game utilities">
-  <!-- Tab order: 2. Instructions button -->
-  <button type="button" class="instructions-button" aria-label="Open keyboard instructions" tabindex="2">
-    <span class="instructions-button-text">Instructions for Keyboard Gameplay</span>
-  </button>
-  <button type="button" class="preferences-button" aria-label="Open accessibility preferences" tabindex="3">
-    <span class="preferences-button-text">Preferences</span>
-  </button>
-</div>
-<dialog class="instruction-dialog" aria-labelledby="instruction-dialog-title" aria-describedby="instruction-dialog-description">
+</dialog>
+<dialog class="instruction-dialog" aria-labelledby="instruction-dialog-title" aria-describedby="instruction-dialog-description" aria-modal="true">
   <button type="button" class="close-instructions-button" aria-label="Close instructions">&times;</button>
   <h2 id="instruction-dialog-title">Instructions for Keyboard Gameplay</h2>
   <p id="instruction-dialog-description" class="sr-only">Read controls and edit keyboard shortcuts for reveal, flag and reveal around actions.</p>
@@ -157,7 +162,7 @@
   </div>
 </dialog>
 
-<dialog class="preferences-dialog" aria-labelledby="preferences-dialog-title" aria-describedby="preferences-dialog-description">
+<dialog class="preferences-dialog" aria-labelledby="preferences-dialog-title" aria-describedby="preferences-dialog-description" aria-modal="true">
   <button type="button" class="close-preferences-button" aria-label="Close preferences">&times;</button>
   <h2 id="preferences-dialog-title">Accessibility preferences</h2>
   <p id="preferences-dialog-description">Adjust haptics and announcement verbosity.</p>
@@ -175,7 +180,7 @@
   </div>
 </dialog>
 
-<dialog class="shortcut-dialog" aria-labelledby="shortcut-dialog-title" aria-describedby="shortcut-dialog-description">
+<dialog class="shortcut-dialog" aria-labelledby="shortcut-dialog-title" aria-describedby="shortcut-dialog-description" aria-modal="true">
   <h2 id="shortcut-dialog-title">Shortcut editor</h2>
   <p id="shortcut-dialog-description">Please press a key</p>
 </dialog>

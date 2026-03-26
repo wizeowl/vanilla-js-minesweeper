@@ -26,6 +26,9 @@ const UI_ELEMENTS = {
   SHORTCUT_INSTRUCTION: '.instruction[data-action]',
   LIVE_STATUS: '.a11y-live-status',
   LIVE_ALERT: '.a11y-live-alert',
+  QUICK_ACCESS_LINK: '.quick-access [data-focus-target]',
+  RESULTS_DIALOG: 'dialog.results-dialog',
+  CLOSE_RESULTS_BUTTON: '.close-results-button',
   NEW_GAME_BUTTON_MODAL: '.new-game-button',
 };
 
@@ -123,6 +126,9 @@ let lastHapticTimestamp = 0;
 let gridItems = [];
 let activeCell = { row: 0, col: 0 };
 let shouldFocusInstructions = false;
+let boardTabStopEnabled = false;
+let resultsDialog;
+let lastResultsReturnFocusElement = null;
 const lastAnnouncements = {
   status: { message: '', timestamp: 0 },
   alert: { message: '', timestamp: 0 },
@@ -227,6 +233,64 @@ function updateBoardMetadata() {
   gridElement.setAttribute('aria-colcount', String(cols));
 }
 
+function setBoardTabStopEnabled(enabled) {
+  boardTabStopEnabled = enabled;
+  const current = getGridItem(activeCell.row, activeCell.col);
+  if (current) {
+    current.setAttribute('tabindex', enabled ? '0' : '-1');
+  }
+}
+
+function focusBoard() {
+  if (isDialogOpen()) {
+    return;
+  }
+
+  setBoardTabStopEnabled(true);
+  updateActiveCell(true);
+}
+
+function closeResultsDialog(options = {}) {
+  const { returnFocus = true, announce = true } = options;
+
+  if (!resultsDialog?.open) {
+    return;
+  }
+
+  resultsDialog.close();
+
+  if (announce) {
+    announceStatus('Results dialog closed.');
+  }
+
+  if (returnFocus) {
+    const focusTarget = lastResultsReturnFocusElement ?? mainButton;
+    focusTarget?.focus?.();
+  }
+
+  lastResultsReturnFocusElement = null;
+}
+
+function openResultsDialog() {
+  if (!resultsDialog || resultsDialog.open) {
+    return;
+  }
+
+  lastResultsReturnFocusElement = document.activeElement instanceof HTMLElement
+    ? document.activeElement
+    : mainButton;
+
+  resultsDialog.showModal();
+
+  const newGameModalBtn = document.querySelector(UI_ELEMENTS.NEW_GAME_BUTTON_MODAL);
+  if (newGameModalBtn) {
+    setTimeout(() => {
+      newGameModalBtn.focus();
+      announceStatus('Game won. Focus on new game button in results.');
+    }, 100);
+  }
+}
+
 function updateActiveCell(shouldFocus = false) {
   const previous = getGridItem(activeCell.row, activeCell.col);
   if (previous) {
@@ -240,7 +304,7 @@ function updateActiveCell(shouldFocus = false) {
   }
 
   activeCell = { row: highlightY, col: highlightX };
-  next.setAttribute('tabindex', '0');
+  next.setAttribute('tabindex', boardTabStopEnabled ? '0' : '-1');
   next.setAttribute('aria-selected', 'true');
 
   highlightElement.setAttribute('aria-label', `Reveal selected cell at row ${highlightY + 1}, column ${highlightX + 1}`);
@@ -269,6 +333,7 @@ function paintGrid(grid) {
       setGridItemA11yState(i, j, 'HIDDEN');
 
       gridItem.addEventListener('click', () => {
+        setBoardTabStopEnabled(true);
         highlightX = j;
         highlightY = i;
         renderHighlight();
@@ -297,6 +362,7 @@ function paintGrid(grid) {
 
       gridItem.addEventListener('contextmenu', (event) => {
         event.preventDefault();
+        setBoardTabStopEnabled(true);
         highlightX = j;
         highlightY = i;
         renderHighlight();
@@ -309,6 +375,7 @@ function paintGrid(grid) {
 
       gridItem.addEventListener('touchstart', (event) => {
         event.preventDefault();
+        setBoardTabStopEnabled(true);
         highlightX = j;
         highlightY = i;
         renderHighlight();
@@ -534,14 +601,7 @@ function checkWin() {
     mainButton.classList.add(CSS_CLASSES.GAME_WON);
     announceAlert(`You won in ${time} seconds. ${visited.size} safe cells revealed.`);
     stopTimer();
-
-    const newGameModalBtn = document.querySelector(UI_ELEMENTS.NEW_GAME_BUTTON_MODAL);
-    if (newGameModalBtn) {
-      setTimeout(() => {
-        newGameModalBtn.focus();
-        announceStatus('Game won. Focus on new game button in results.');
-      }, 100);
-    }
+    openResultsDialog();
   }
 }
 
@@ -589,11 +649,14 @@ function setDifficulty(config) {
   shouldFocusInstructions = true;
   mainGrid = init(gridConfig.ROWS, gridConfig.COLS, gridConfig.MINES);
   localStorage.setItem(SYMBOLS.CONFIG, JSON.stringify(config));
-  document.querySelector(UI_ELEMENTS.GRID_CONTAINER).focus();
   announceStatus(`Difficulty set to ${config.DIFFICULTY}.`);
 }
 
 function startNewGame() {
+  if (resultsDialog?.open) {
+    closeResultsDialog({ returnFocus: false, announce: false });
+  }
+
   mainGrid = init(gridConfig.ROWS, gridConfig.COLS, gridConfig.MINES);
   announceStatus(`New game started on ${gridConfig.DIFFICULTY} difficulty.`);
 
@@ -637,8 +700,29 @@ function bindKeyboardActivation(element, callback) {
   });
 }
 
+function isInteractiveKeyboardTarget(target) {
+  return target instanceof HTMLElement
+    && Boolean(target.closest('a, button, input, select, textarea, summary'));
+}
+
 function isDialogOpen() {
   return Boolean(document.querySelector('dialog[open]'));
+}
+
+function bindQuickAccessLinks() {
+  document.querySelectorAll(UI_ELEMENTS.QUICK_ACCESS_LINK).forEach((link) => {
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+
+      if (link.dataset.focusTarget === 'board') {
+        focusBoard();
+        return;
+      }
+
+      const target = document.querySelector(link.dataset.focusTarget);
+      target?.focus?.();
+    });
+  });
 }
 
 function bindStaticEventListeners() {
@@ -647,7 +731,15 @@ function bindStaticEventListeners() {
 
   const newGameButton = document.querySelector(UI_ELEMENTS.NEW_GAME_BUTTON);
   if (newGameButton) {
-    newGameButton.addEventListener('click', startNewGame);
+    newGameButton.addEventListener('click', () => {
+      shouldFocusInstructions = true;
+      startNewGame();
+    });
+  }
+
+  const closeResultsButton = document.querySelector(UI_ELEMENTS.CLOSE_RESULTS_BUTTON);
+  if (closeResultsButton) {
+    closeResultsButton.addEventListener('click', () => closeResultsDialog());
   }
 
   highlightElement.addEventListener('click', () => inspect(mainGrid, highlightY, highlightX));
@@ -682,14 +774,32 @@ function bindStaticEventListeners() {
     element.addEventListener('click', openShortcutEditor);
     bindKeyboardActivation(element, openShortcutEditor);
   });
+
+  document.querySelector(UI_ELEMENTS.GRID)?.addEventListener('focusout', (event) => {
+    if (event.relatedTarget && event.currentTarget.contains(event.relatedTarget)) {
+      return;
+    }
+
+    setBoardTabStopEnabled(false);
+    updateActiveCell(false);
+  });
+
+  resultsDialog?.addEventListener('cancel', (event) => {
+    event.preventDefault();
+    closeResultsDialog();
+  });
 }
 
 function updateGridConfig(config) {
   const buttons = document.querySelectorAll(UI_ELEMENTS.DIFFICULTY_BUTTON);
-  buttons.forEach(button => button.classList.remove(CSS_CLASSES.ACTIVE));
+  buttons.forEach((button) => {
+    button.classList.remove(CSS_CLASSES.ACTIVE);
+    button.setAttribute('aria-pressed', 'false');
+  });
 
   const difficultyButton = document.querySelector(`[data-difficulty="${config.DIFFICULTY}"]`);
   difficultyButton.classList.add(CSS_CLASSES.ACTIVE);
+  difficultyButton.setAttribute('aria-pressed', 'true');
 
   gridConfig = config;
   rows = config.ROWS ?? config.rows;
@@ -712,6 +822,7 @@ function init(numRows, numCols, numMines) {
   status = SYMBOLS.CURRENT;
   lastTap = null;
   lastTouchInteractionTime = 0;
+  boardTabStopEnabled = false;
   updateMinesCounter();
 
   initHighlight();
@@ -737,6 +848,7 @@ document.addEventListener('DOMContentLoaded', function() {
   liveStatusElement = document.querySelector(UI_ELEMENTS.LIVE_STATUS);
   liveAlertElement = document.querySelector(UI_ELEMENTS.LIVE_ALERT);
   highlightElement = document.querySelector(UI_ELEMENTS.HIGHLIGHT_ELEMENT);
+  resultsDialog = document.querySelector(UI_ELEMENTS.RESULTS_DIALOG);
   const closeInstructionsButton = document.querySelector(UI_ELEMENTS.CLOSE_INSTRUCTIONS_BUTTON);
 
   if (closeInstructionsButton) {
@@ -744,7 +856,13 @@ document.addEventListener('DOMContentLoaded', function() {
     bindKeyboardActivation(closeInstructionsButton, closeInstructionsDialog);
   }
 
+  document.querySelector(UI_ELEMENTS.INSTRUCTIONS_DIALOG)?.addEventListener('cancel', (event) => {
+    event.preventDefault();
+    closeInstructionsDialog();
+  });
+
   bindStaticEventListeners();
+  bindQuickAccessLinks();
 
   updateGridConfig(getDefaultDifficultyConfig());
   mainGrid = init(gridConfig.ROWS, gridConfig.COLS, gridConfig.MINES);
@@ -756,7 +874,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // the new game shortcut should function regardless of the game status
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' && !isInteractiveKeyboardTarget(event.target)) {
       startNewGame();
     }
 
@@ -768,30 +886,37 @@ document.addEventListener('DOMContentLoaded', function() {
       case 'ArrowLeft':
         event.preventDefault();
         moveHighlight(-1, 0, gridConfig.ROWS - 1, gridConfig.COLS - 1);
+        setBoardTabStopEnabled(true);
         updateActiveCell(true);
         break;
       case 'ArrowUp':
         event.preventDefault();
         moveHighlight(0, -1, gridConfig.ROWS - 1, gridConfig.COLS - 1);
+        setBoardTabStopEnabled(true);
         updateActiveCell(true);
         break;
       case 'ArrowRight':
         event.preventDefault();
         moveHighlight(1, 0, gridConfig.ROWS - 1, gridConfig.COLS - 1);
+        setBoardTabStopEnabled(true);
         updateActiveCell(true);
         break;
       case 'ArrowDown':
         event.preventDefault();
         moveHighlight(0, 1, gridConfig.ROWS - 1, gridConfig.COLS - 1);
+        setBoardTabStopEnabled(true);
         updateActiveCell(true);
         break;
       case getShortcut(ACTIONS.FLAG):
+        setBoardTabStopEnabled(true);
         annotate(mainGrid, highlightY, highlightX);
         break;
       case getShortcut(ACTIONS.REVEAL_AROUND):
+        setBoardTabStopEnabled(true);
         inspectNeighborhood(mainGrid, highlightY, highlightX);
         break;
       case getShortcut(ACTIONS.REVEAL):
+        setBoardTabStopEnabled(true);
         inspect(mainGrid, highlightY, highlightX);
         break;
       default:
