@@ -54,6 +54,62 @@ function getNeighboringSquares(grid, row, col) {
   return neighbors;
 }
 
+function getProtectedZoneCoordinates(grid, row, col) {
+  const coordinates = [[row, col]];
+
+  getNeighboringSquares(grid, row, col).forEach(([_, neighborRow, neighborCol]) => {
+    coordinates.push([neighborRow, neighborCol]);
+  });
+
+  return coordinates;
+}
+
+function relocateMinesFromProtectedZone(grid, row, col, mineSymbol) {
+  if (!grid?.length || !grid[0]?.length) {
+    return false;
+  }
+
+  const protectedCoordinates = getProtectedZoneCoordinates(grid, row, col);
+  const protectedSet = new Set(
+    protectedCoordinates.map(([protectedRow, protectedCol]) => `${protectedRow},${protectedCol}`)
+  );
+
+  const minesToRelocate = protectedCoordinates.filter(
+    ([protectedRow, protectedCol]) => grid[protectedRow][protectedCol] === mineSymbol
+  );
+
+  if (minesToRelocate.length === 0) {
+    return true;
+  }
+
+  const relocationTargets = [];
+
+  grid.forEach((gridRow, gridRowIndex) => {
+    gridRow.forEach((cell, gridColIndex) => {
+      const key = `${gridRowIndex},${gridColIndex}`;
+      if (!protectedSet.has(key) && cell !== mineSymbol) {
+        relocationTargets.push([gridRowIndex, gridColIndex]);
+      }
+    });
+  });
+
+  if (relocationTargets.length < minesToRelocate.length) {
+    return false;
+  }
+
+  shuffleArray(relocationTargets);
+
+  minesToRelocate.forEach(([mineRow, mineCol]) => {
+    grid[mineRow][mineCol] = undefined;
+  });
+
+  relocationTargets.slice(0, minesToRelocate.length).forEach(([targetRow, targetCol]) => {
+    grid[targetRow][targetCol] = mineSymbol;
+  });
+
+  return true;
+}
+
 function getDigits(number) {
   const h = Math.floor((number) / 100);
   const t = Math.floor((number % 100) / 10);

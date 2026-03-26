@@ -397,6 +397,21 @@ function showError(row, col) {
   }
 }
 
+function syncDebugMineMarkers(grid) {
+  if (!debugMode) {
+    return;
+  }
+
+  grid.forEach((row, i) => {
+    row.forEach((_, j) => {
+      const gridItem = getGridItem(i, j);
+      if (gridItem) {
+        gridItem.textContent = grid[i][j] === SYMBOLS.MINE ? SYMBOLS.MINE : '';
+      }
+    });
+  });
+}
+
 function annotate(grid, row, col) {
   const key = `${row}, ${col}`;
   if (visited.has(key)) {
@@ -468,6 +483,11 @@ function inspect(grid, row, col, options = {}) {
 
   if (flagged.has(key) || visited.has(key) || status === SYMBOLS.GAME_OVER || status === SYMBOLS.WON) {
     return;
+  }
+
+  if (visited.size === 0) {
+    relocateMinesFromProtectedZone(grid, row, col, SYMBOLS.MINE);
+    syncDebugMineMarkers(grid);
   }
 
   if (grid[row][col] === SYMBOLS.MINE) {
