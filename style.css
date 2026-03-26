@@ -664,6 +664,14 @@ main {
     box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.35);
 }
 
+.instruction-dialog,
+.preferences-dialog {
+    padding: 0;
+    border: none;
+    background: transparent;
+    overflow: visible;
+}
+
 .instruction-dialog::backdrop,
 .preferences-dialog::backdrop,
 .shortcut-dialog::backdrop,
@@ -676,6 +684,58 @@ main {
 .shortcut-dialog h2,
 .statistics-dialog h2 {
     margin: 0 0 12px;
+}
+
+.instruction-dialog .dialog-window-shell,
+.preferences-dialog .dialog-window-shell {
+    position: relative;
+    overflow: hidden;
+    background: #c0c0c0;
+    border-top: 2px solid #fff;
+    border-left: 2px solid #fff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    box-shadow: 2px 2px 0 #000;
+}
+
+.dialog-window-titlebar {
+    display: flex;
+    align-items: center;
+    min-height: 32px;
+    padding: 0 44px 0 10px;
+    color: #fff;
+    background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
+}
+
+.dialog-window-titlebar h2 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.dialog-window-body {
+    padding: 18px 20px 20px;
+    background: #c0c0c0;
+}
+
+.instruction-dialog .dialog-window-body {
+    max-height: min(70vh, 720px);
+    overflow: auto;
+}
+
+.instruction-dialog .instructions {
+    padding-top: 2px;
+}
+
+.instruction-dialog .instructions ol {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.instruction-dialog .instructions ul {
+    margin: 8px 0 0;
+    padding-left: 20px;
 }
 
 .instruction-dialog p,
@@ -733,6 +793,10 @@ main {
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.preferences-dialog .preferences-field {
+    align-items: flex-start;
 }
 
 .preference-announcement-level {
@@ -819,6 +883,16 @@ main {
     background-repeat: no-repeat;
     background-size: 100% 100%;
     line-height: 1;
+}
+
+.close-instructions-button,
+.close-preferences-button {
+    top: 6px;
+    right: 6px;
+    width: 24px;
+    height: 24px;
+    font-size: 18px;
+    z-index: 2;
 }
 
 .close-instructions-button:active,
@@ -911,6 +985,15 @@ main {
         width: calc(100vw - 16px);
         padding: 20px;
         padding-right: 60px;
+    }
+
+    .instruction-dialog,
+    .preferences-dialog {
+        padding: 0;
+    }
+
+    .dialog-window-body {
+        padding: 16px;
     }
 
     .statistics-cards {

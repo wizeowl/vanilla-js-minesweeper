@@ -169,71 +169,83 @@
 </dialog>
 <dialog class="instruction-dialog" aria-labelledby="instruction-dialog-title" aria-describedby="instruction-dialog-description" aria-modal="true">
   <button type="button" class="close-instructions-button" aria-label="Close instructions">&times;</button>
-  <h2 id="instruction-dialog-title">Instructions for Keyboard Gameplay</h2>
-  <p id="instruction-dialog-description" class="sr-only">Read controls and edit keyboard shortcuts for reveal, flag and reveal around actions.</p>
-  <div class="instructions">
-    <ol>
-      <li><strong>Starting a New Game:</strong>
-        <ul>
-          <li>Press the Enter key to start a new game.</li>
-        </ul>
-      </li>
-      <li><strong>Navigation:</strong>
-        <ul>
-          <li>Use the arrow keys (Up, Down, Left, Right) to navigate the grid.</li>
-          <li>Move the cursor to the desired cell.</li>
-        </ul>
-      </li>
-      <li><strong>Revealing Cells:</strong>
-        <ul>
-          <li>Press the '<button type="button" class="instruction REVEAL" data-action="REVEAL" aria-label="Edit reveal shortcut">c</button>' key to reveal the content of the highlighted cell.</li>
-          <li>Be cautious! Revealing a mine will end the game.</li>
-        </ul>
-      </li>
-      <li><strong>Flagging Mines:</strong>
-        <ul>
-          <li>Press the '<button type="button" class="instruction FLAG" data-action="FLAG" aria-label="Edit flag shortcut">w</button>' key to flag/unflag a suspected mine.</li>
-          <li>Use flags to mark cells that you believe contain mines.</li>
-        </ul>
-      </li>
-      <li><strong>Double Click Action:</strong>
-        <ul>
-          <li>Double-click on a cell to reveal adjacent cells if the neighboring mines are correctly flagged around it.</li>
-          <li>Press the '<button type="button" class="instruction REVEAL_AROUND" data-action="REVEAL_AROUND" aria-label="Edit reveal around shortcut">x</button>' reveal around the highlighted cell.</li>
-        </ul>
-      </li>
-      <li><strong>Touch Controls (Mobile/Tablets):</strong>
-        <ul>
-          <li>Tap a cell to reveal it.</li>
-          <li>Long-press a cell to place or remove a flag.</li>
-          <li>Double-tap a revealed cell to reveal surrounding cells.</li>
-        </ul>
-      </li>
-      <li><strong>Winning the Game:</strong>
-        <ul>
-          <li>Successfully reveal all non-mine cells to win the game.</li>
-          <li>Use logic and strategy to uncover safe cells without triggering mines.</li>
-        </ul>
-      </li>
-    </ol>
+  <div class="dialog-window-shell">
+    <div class="dialog-window-titlebar">
+      <h2 id="instruction-dialog-title">Instructions for Keyboard Gameplay</h2>
+    </div>
+    <div class="dialog-window-body">
+      <p id="instruction-dialog-description" class="sr-only">Read controls and edit keyboard shortcuts for reveal, flag and reveal around actions.</p>
+      <div class="instructions">
+        <ol>
+          <li><strong>Starting a New Game:</strong>
+            <ul>
+              <li>Press the Enter key to start a new game.</li>
+            </ul>
+          </li>
+          <li><strong>Navigation:</strong>
+            <ul>
+              <li>Use the arrow keys (Up, Down, Left, Right) to navigate the grid.</li>
+              <li>Move the cursor to the desired cell.</li>
+            </ul>
+          </li>
+          <li><strong>Revealing Cells:</strong>
+            <ul>
+              <li>Press the '<button type="button" class="instruction REVEAL" data-action="REVEAL" aria-label="Edit reveal shortcut">c</button>' key to reveal the content of the highlighted cell.</li>
+              <li>Be cautious! Revealing a mine will end the game.</li>
+            </ul>
+          </li>
+          <li><strong>Flagging Mines:</strong>
+            <ul>
+              <li>Press the '<button type="button" class="instruction FLAG" data-action="FLAG" aria-label="Edit flag shortcut">w</button>' key to flag/unflag a suspected mine.</li>
+              <li>Use flags to mark cells that you believe contain mines.</li>
+            </ul>
+          </li>
+          <li><strong>Double Click Action:</strong>
+            <ul>
+              <li>Double-click on a cell to reveal adjacent cells if the neighboring mines are correctly flagged around it.</li>
+              <li>Press the '<button type="button" class="instruction REVEAL_AROUND" data-action="REVEAL_AROUND" aria-label="Edit reveal around shortcut">x</button>' reveal around the highlighted cell.</li>
+            </ul>
+          </li>
+          <li><strong>Touch Controls (Mobile/Tablets):</strong>
+            <ul>
+              <li>Tap a cell to reveal it.</li>
+              <li>Long-press a cell to place or remove a flag.</li>
+              <li>Double-tap a revealed cell to reveal surrounding cells.</li>
+            </ul>
+          </li>
+          <li><strong>Winning the Game:</strong>
+            <ul>
+              <li>Successfully reveal all non-mine cells to win the game.</li>
+              <li>Use logic and strategy to uncover safe cells without triggering mines.</li>
+            </ul>
+          </li>
+        </ol>
+      </div>
+    </div>
   </div>
 </dialog>
 
 <dialog class="preferences-dialog" aria-labelledby="preferences-dialog-title" aria-describedby="preferences-dialog-description" aria-modal="true">
   <button type="button" class="close-preferences-button" aria-label="Close preferences">&times;</button>
-  <h2 id="preferences-dialog-title">Accessibility preferences</h2>
-  <p id="preferences-dialog-description">Adjust haptics and announcement verbosity.</p>
-  <div class="preferences-content">
-    <label class="preferences-field">
-      <input type="checkbox" class="preference-haptics-toggle">
-      Enable haptic feedback when supported
-    </label>
+  <div class="dialog-window-shell">
+    <div class="dialog-window-titlebar">
+      <h2 id="preferences-dialog-title">Accessibility preferences</h2>
+    </div>
+    <div class="dialog-window-body">
+      <p id="preferences-dialog-description">Adjust haptics and announcement verbosity.</p>
+      <div class="preferences-content">
+        <label class="preferences-field">
+          <input type="checkbox" class="preference-haptics-toggle">
+          Enable haptic feedback when supported
+        </label>
 
-    <label class="preferences-field" for="announcement-level-select">Announcement level</label>
-    <select id="announcement-level-select" class="preference-announcement-level">
-      <option value="normal">Normal</option>
-      <option value="verbose">Verbose</option>
-    </select>
+        <label class="preferences-field" for="announcement-level-select">Announcement level</label>
+        <select id="announcement-level-select" class="preference-announcement-level">
+          <option value="normal">Normal</option>
+          <option value="verbose">Verbose</option>
+        </select>
+      </div>
+    </div>
   </div>
 </dialog>
 
