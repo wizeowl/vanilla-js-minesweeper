@@ -8,6 +8,11 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 16px;
+    box-sizing: border-box;
+    background: #008080;
 }
 
 .quick-access {
@@ -40,7 +45,6 @@ body {
     font-weight: 700;
 }
 
-header,
 main {
     width: 100%;
     display: flex;
@@ -60,16 +64,130 @@ main {
     border: 0;
 }
 
-.title {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
 
 .game-container {
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.window-shell {
+    display: inline-flex;
+    flex-direction: column;
+    width: fit-content;
+    background: #c0c0c0;
+    border-top: 2px solid #fff;
+    border-left: 2px solid #fff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    box-shadow: 2px 2px 0 #000;
+}
+
+.window-titlebar {
+    display: flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0 8px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
+}
+
+.window-title {
+    white-space: nowrap;
+}
+
+.menu-bar {
+    display: flex;
+    align-items: center;
+    min-height: 32px;
+    padding: 2px 4px;
+    background: #c0c0c0;
+    border-top: 1px solid #dfdfdf;
+    border-bottom: 1px solid #808080;
+}
+
+.menu-root,
+.menu-submenu {
+    position: relative;
+}
+
+.menu-trigger,
+.menu-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 28px;
+    padding: 4px 12px;
+    border: 1px solid transparent;
+    background: #c0c0c0;
+    color: #111;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.menu-trigger {
+    width: auto;
+    min-width: 84px;
+}
+
+.menu-trigger[aria-expanded="true"],
+.menu-item:hover,
+.menu-item:focus-visible,
+.submenu-trigger[aria-expanded="true"] {
+    color: #fff;
+    background: #000080;
+}
+
+.menu-popup,
+.submenu-popup {
+    position: absolute;
+    z-index: 30;
+    min-width: 220px;
+    padding: 2px;
+    background: #c0c0c0;
+    border-top: 2px solid #fff;
+    border-left: 2px solid #fff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
+}
+
+.menu-popup {
+    top: calc(100% + 2px);
+    left: 0;
+}
+
+.submenu-popup {
+    top: -4px;
+    left: calc(100% - 2px);
+}
+
+.menu-separator {
+    height: 2px;
+    margin: 4px 6px;
+    background: linear-gradient(to bottom, #808080 0, #808080 1px, #fff 1px, #fff 2px);
+}
+
+.submenu-trigger::after {
+    content: "▶";
+    margin-left: auto;
+    font-size: 12px;
+}
+
+.menu-difficulty-item[aria-checked="true"]::before {
+    content: "✓";
+    margin-right: 8px;
+}
+
+.menu-difficulty-item[aria-checked="false"]::before {
+    content: "";
+    display: inline-block;
+    width: 0.9em;
+    margin-right: 8px;
 }
 
 .game-shell,
@@ -535,7 +653,8 @@ main {
 
 .instruction-dialog,
 .preferences-dialog,
-.shortcut-dialog {
+.shortcut-dialog,
+.statistics-dialog {
     position: relative;
     max-width: min(560px, calc(100vw - 32px));
     padding: 24px;
@@ -547,20 +666,60 @@ main {
 
 .instruction-dialog::backdrop,
 .preferences-dialog::backdrop,
-.shortcut-dialog::backdrop {
+.shortcut-dialog::backdrop,
+.statistics-dialog::backdrop {
     background: rgba(0, 0, 0, 0.25);
 }
 
 .instruction-dialog h2,
 .preferences-dialog h2,
-.shortcut-dialog h2 {
+.shortcut-dialog h2,
+.statistics-dialog h2 {
     margin: 0 0 12px;
 }
 
 .instruction-dialog p,
 .preferences-dialog p,
-.shortcut-dialog p {
+.shortcut-dialog p,
+.statistics-dialog p {
     margin-top: 0;
+}
+
+.statistics-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    min-width: min(680px, calc(100vw - 80px));
+}
+
+.statistics-card {
+    padding: 12px;
+    background: #dfdfdf;
+    border-top: 2px solid #fff;
+    border-left: 2px solid #fff;
+    border-right: 2px solid #808080;
+    border-bottom: 2px solid #808080;
+}
+
+.statistics-card h3 {
+    margin: 0 0 8px;
+}
+
+.statistics-card dl {
+    margin: 0;
+    display: grid;
+    gap: 8px;
+}
+
+.statistics-card dl div {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+}
+
+.statistics-card dt,
+.statistics-card dd {
+    margin: 0;
 }
 
 .preferences-content {
@@ -583,6 +742,8 @@ main {
 
 .main-button:focus-visible,
 .grid-item-highlight:focus-visible,
+.menu-trigger:focus-visible,
+.menu-item:focus-visible,
 .difficulty-controls button:focus-visible,
 .new-game-button:focus-visible,
 .instructions-button:focus-visible,
@@ -592,6 +753,7 @@ main {
 .close-instructions-button:focus-visible,
 .close-preferences-button:focus-visible,
 .close-results-button:focus-visible,
+.close-statistics-button:focus-visible,
 .preference-announcement-level:focus-visible {
     outline: 2px solid #005fcc;
     outline-offset: 2px;
@@ -638,7 +800,8 @@ main {
 
 .close-instructions-button,
 .close-preferences-button,
-.close-results-button {
+.close-results-button,
+.close-statistics-button {
     position: absolute;
     top: 16px;
     right: 16px;
@@ -660,7 +823,8 @@ main {
 
 .close-instructions-button:active,
 .close-preferences-button:active,
-.close-results-button:active {
+.close-results-button:active,
+.close-statistics-button:active {
     background-image: url("assets/button_pressed.svg");
     transform: translate(1px, 1px);
 }
@@ -742,16 +906,24 @@ main {
 
     .instruction-dialog,
     .preferences-dialog,
-    .shortcut-dialog {
+    .shortcut-dialog,
+    .statistics-dialog {
         width: calc(100vw - 16px);
         padding: 20px;
         padding-right: 60px;
+    }
+
+    .statistics-cards {
+        min-width: 0;
+        grid-template-columns: 1fr;
     }
 }
 
 @media (prefers-contrast: more) {
     .main-button:focus-visible,
     .grid-item-highlight:focus-visible,
+    .menu-trigger:focus-visible,
+    .menu-item:focus-visible,
     .difficulty-controls button:focus-visible,
     .new-game-button:focus-visible,
     .instructions-button:focus-visible,
@@ -761,6 +933,7 @@ main {
     .close-instructions-button:focus-visible,
     .close-preferences-button:focus-visible,
     .close-results-button:focus-visible,
+.close-statistics-button:focus-visible,
     .preference-announcement-level:focus-visible {
         outline: 3px solid #000;
     }

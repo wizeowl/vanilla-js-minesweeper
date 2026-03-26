@@ -16,66 +16,89 @@
 </head>
 <body>
 <nav class="quick-access" aria-label="Quick access">
-  <a href="#main-game-button" data-focus-target="#main-game-button">Skip to new game</a>
-  <a href="#instructions-button" data-focus-target="#instructions-button">Skip to instructions</a>
-  <a href="#preferences-button" data-focus-target="#preferences-button">Skip to preferences</a>
-  <a href="#difficulty-beginner" data-focus-target="#difficulty-beginner">Skip to difficulty</a>
+  <a href="#game-menu-button" data-focus-target="#game-menu-button">Skip to game menu</a>
+  <a href="#menu-new-game" data-focus-target="menu:new-game">Skip to new game</a>
+  <a href="#menu-instructions" data-focus-target="menu:instructions">Skip to instructions</a>
+  <a href="#menu-preferences" data-focus-target="menu:preferences">Skip to preferences</a>
+  <a href="#difficulty-beginner" data-focus-target="menu:difficulty">Skip to difficulty</a>
   <a href="#game-board" data-focus-target="board">Skip to game board</a>
 </nav>
-<header>
-  <h1 class="title"><img src="assets/flag.svg" alt="" aria-hidden="true"> Classic minesweeper <img src="assets/flag.svg" alt="" aria-hidden="true"></h1>
-</header>
 
 <main id="main-content">
   <div class="sr-only a11y-live-status" role="status" aria-live="polite" aria-atomic="true"></div>
   <div class="sr-only a11y-live-alert" role="alert" aria-live="assertive" aria-atomic="true"></div>
 
   <section class="game-container" aria-label="Minesweeper game">
-    <div class="game-shell">
-      <div class="bar top-bar"></div>
-      <div class="top-panel">
-        <div class="vertical-bar"></div>
-        <div class="top-controls">
-          <div class="numbers-panel mine_counter">
-            <div class="number d0 mines-hundreds"></div>
-            <div class="number d0 mines-tens"></div>
-            <div class="number d0 mines-digits"></div>
-          </div>
-          <button type="button" id="main-game-button" class="main-button" aria-label="Start a new game"></button>
-          <div class="numbers-panel timer">
-            <div class="number d0 timer-hundreds"></div>
-            <div class="number d0 timer-tens"></div>
-            <div class="number d0 timer-digits"></div>
+    <div class="window-shell">
+      <div class="window-titlebar" aria-hidden="true">
+        <span class="window-title">Classic Minesweeper</span>
+      </div>
+      <div class="menu-bar" role="menubar" aria-label="Game menu bar">
+        <div class="menu-root">
+          <button
+            type="button"
+            id="game-menu-button"
+            class="menu-trigger"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-controls="game-menu"
+          >
+            Game
+          </button>
+          <div id="game-menu" class="menu-popup" role="menu" hidden>
+            <button type="button" id="menu-new-game" class="menu-item" role="menuitem">New game</button>
+            <div class="menu-separator" role="separator"></div>
+            <button type="button" id="menu-instructions" class="menu-item" role="menuitem">Instructions</button>
+            <button type="button" id="menu-preferences" class="menu-item" role="menuitem">Preferences</button>
+            <div class="menu-submenu">
+              <button
+                type="button"
+                id="menu-difficulty-button"
+                class="menu-item submenu-trigger"
+                role="menuitem"
+                aria-haspopup="true"
+                aria-expanded="false"
+                aria-controls="difficulty-submenu"
+              >
+                Difficulty
+              </button>
+              <div id="difficulty-submenu" class="submenu-popup" role="menu" hidden>
+                <button type="button" id="difficulty-beginner" class="menu-item menu-difficulty-item" role="menuitemradio" data-difficulty="BEGINNER" aria-checked="false">Beginner</button>
+                <button type="button" class="menu-item menu-difficulty-item" role="menuitemradio" data-difficulty="INTERMEDIATE" aria-checked="false">Intermediate</button>
+                <button type="button" class="menu-item menu-difficulty-item" role="menuitemradio" data-difficulty="EXPERT" aria-checked="false">Expert</button>
+              </div>
+            </div>
+            <button type="button" id="menu-statistics" class="menu-item" role="menuitem">Statistics</button>
           </div>
         </div>
-        <div class="vertical-bar"></div>
       </div>
-      <div class="bar"></div>
-      <div class="grid-container">
-        <div class="vertical-bar"></div>
-        <button type="button" class="grid-item-highlight" aria-label="Reveal selected cell" tabindex="-1"></button>
-        <div id="game-board" class="grid" role="grid" aria-label="Minesweeper game board" tabindex="-1"></div>
-        <div class="vertical-bar"></div>
-      </div>
-      <div class="bar"></div>
-    </div>
-
-    <div class="utility-controls" role="group" aria-label="Game utilities">
-      <button type="button" id="instructions-button" class="instructions-button" aria-label="Open keyboard instructions">
-        <span class="instructions-button-text">Instructions for Keyboard Gameplay</span>
-      </button>
-      <button type="button" id="preferences-button" class="preferences-button" aria-label="Open accessibility preferences">
-        <span class="preferences-button-text">Preferences</span>
-      </button>
-    </div>
-
-    <div class="game-footer-shell">
-      <div id="difficulty-controls" class="difficulty-controls" role="group" aria-label="Game difficulty">
-        <button type="button" id="difficulty-beginner" class="difficulty-button" data-difficulty="BEGINNER" aria-pressed="false">Beginner</button>
-        <button type="button" class="difficulty-button" data-difficulty="INTERMEDIATE" aria-pressed="false">
-          Intermediate
-        </button>
-        <button type="button" class="difficulty-button" data-difficulty="EXPERT" aria-pressed="false">Expert</button>
+      <div class="game-shell">
+        <div class="bar top-bar"></div>
+        <div class="top-panel">
+          <div class="vertical-bar"></div>
+          <div class="top-controls">
+            <div class="numbers-panel mine_counter">
+              <div class="number d0 mines-hundreds"></div>
+              <div class="number d0 mines-tens"></div>
+              <div class="number d0 mines-digits"></div>
+            </div>
+            <button type="button" id="main-game-button" class="main-button" aria-label="Start a new game"></button>
+            <div class="numbers-panel timer">
+              <div class="number d0 timer-hundreds"></div>
+              <div class="number d0 timer-tens"></div>
+              <div class="number d0 timer-digits"></div>
+            </div>
+          </div>
+          <div class="vertical-bar"></div>
+        </div>
+        <div class="bar"></div>
+        <div class="grid-container">
+          <div class="vertical-bar"></div>
+          <button type="button" class="grid-item-highlight" aria-label="Reveal selected cell" tabindex="-1"></button>
+          <div id="game-board" class="grid" role="grid" aria-label="Minesweeper game board" tabindex="-1"></div>
+          <div class="vertical-bar"></div>
+        </div>
+        <div class="bar"></div>
       </div>
     </div>
   </section>
@@ -109,6 +132,40 @@
     <div class="vertical-bar"></div>
   </div>
   <div class="bar bottom-bar"></div>
+</dialog>
+<dialog class="statistics-dialog" aria-labelledby="statistics-dialog-title" aria-describedby="statistics-dialog-description" aria-modal="true">
+  <button type="button" class="close-statistics-button" aria-label="Close statistics">&times;</button>
+  <h2 id="statistics-dialog-title">Statistics</h2>
+  <p id="statistics-dialog-description">Review your statistics across all difficulty levels.</p>
+  <div class="statistics-cards">
+    <section class="statistics-card" data-statistics-difficulty="BEGINNER" aria-labelledby="statistics-beginner-title">
+      <h3 id="statistics-beginner-title">Beginner</h3>
+      <dl>
+        <div><dt>Games played</dt><dd data-stat-field="gamesPlayed">0</dd></div>
+        <div><dt>Games won</dt><dd data-stat-field="gamesWon">0</dd></div>
+        <div><dt>Win rate</dt><dd data-stat-field="winRate">0%</dd></div>
+        <div><dt>Best time</dt><dd data-stat-field="bestTime">—</dd></div>
+      </dl>
+    </section>
+    <section class="statistics-card" data-statistics-difficulty="INTERMEDIATE" aria-labelledby="statistics-intermediate-title">
+      <h3 id="statistics-intermediate-title">Intermediate</h3>
+      <dl>
+        <div><dt>Games played</dt><dd data-stat-field="gamesPlayed">0</dd></div>
+        <div><dt>Games won</dt><dd data-stat-field="gamesWon">0</dd></div>
+        <div><dt>Win rate</dt><dd data-stat-field="winRate">0%</dd></div>
+        <div><dt>Best time</dt><dd data-stat-field="bestTime">—</dd></div>
+      </dl>
+    </section>
+    <section class="statistics-card" data-statistics-difficulty="EXPERT" aria-labelledby="statistics-expert-title">
+      <h3 id="statistics-expert-title">Expert</h3>
+      <dl>
+        <div><dt>Games played</dt><dd data-stat-field="gamesPlayed">0</dd></div>
+        <div><dt>Games won</dt><dd data-stat-field="gamesWon">0</dd></div>
+        <div><dt>Win rate</dt><dd data-stat-field="winRate">0%</dd></div>
+        <div><dt>Best time</dt><dd data-stat-field="bestTime">—</dd></div>
+      </dl>
+    </section>
+  </div>
 </dialog>
 <dialog class="instruction-dialog" aria-labelledby="instruction-dialog-title" aria-describedby="instruction-dialog-description" aria-modal="true">
   <button type="button" class="close-instructions-button" aria-label="Close instructions">&times;</button>

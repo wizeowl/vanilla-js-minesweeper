@@ -14,21 +14,33 @@ const UI_ELEMENTS = {
   GRID: '.grid',
   GAME_CONTAINER: '.game-container',
   GRID_CONTAINER: '.grid-container',
+  GAME_MENU_BUTTON: '#game-menu-button',
+  GAME_MENU: '#game-menu',
+  MENU_ROOT: '.menu-root',
+  MENU_NEW_GAME_BUTTON: '#menu-new-game',
+  MENU_INSTRUCTIONS_BUTTON: '#menu-instructions',
+  MENU_PREFERENCES_BUTTON: '#menu-preferences',
+  MENU_DIFFICULTY_BUTTON: '#menu-difficulty-button',
+  DIFFICULTY_SUBMENU: '#difficulty-submenu',
+  MENU_STATISTICS_BUTTON: '#menu-statistics',
   HIGHLIGHT_ELEMENT: '.grid-item-highlight',
-  DIFFICULTY_BUTTON: '.difficulty-controls button',
+  DIFFICULTY_BUTTON: '.menu-difficulty-item',
   INSTRUCTIONS_DIALOG: 'dialog.instruction-dialog',
   CLOSE_INSTRUCTIONS_BUTTON: '.close-instructions-button',
   SHORTCUT_DIALOG: 'dialog.shortcut-dialog',
   REVEAL_INSTRUCTION: '.instruction.REVEAL',
   FLAG_INSTRUCTION: '.instruction.FLAG',
   REVEAL_AROUND_INSTRUCTION: '.instruction.REVEAL_AROUND',
-  INSTRUCTIONS_BUTTON: '.instructions-button',
+  INSTRUCTIONS_BUTTON: '#menu-instructions',
   SHORTCUT_INSTRUCTION: '.instruction[data-action]',
   LIVE_STATUS: '.a11y-live-status',
   LIVE_ALERT: '.a11y-live-alert',
   QUICK_ACCESS_LINK: '.quick-access [data-focus-target]',
   RESULTS_DIALOG: 'dialog.results-dialog',
   CLOSE_RESULTS_BUTTON: '.close-results-button',
+  STATISTICS_DIALOG: 'dialog.statistics-dialog',
+  CLOSE_STATISTICS_BUTTON: '.close-statistics-button',
+  STATISTICS_CARD: '.statistics-card[data-statistics-difficulty]',
   NEW_GAME_BUTTON_MODAL: '.new-game-button',
 };
 
@@ -125,10 +137,17 @@ let lastTap = null;
 let lastHapticTimestamp = 0;
 let gridItems = [];
 let activeCell = { row: 0, col: 0 };
-let shouldFocusInstructions = false;
+let shouldFocusGameMenu = false;
 let boardTabStopEnabled = false;
 let resultsDialog;
+let statisticsDialog;
+let gameMenuButton;
+let gameMenuElement;
+let menuRootElement;
+let menuDifficultyButton;
+let difficultySubmenuElement;
 let lastResultsReturnFocusElement = null;
+let lastStatisticsReturnFocusElement = null;
 const lastAnnouncements = {
   status: { message: '', timestamp: 0 },
   alert: { message: '', timestamp: 0 },
@@ -242,6 +261,10 @@ function setBoardTabStopEnabled(enabled) {
 }
 
 function focusBoard() {
+  if (isMenuOpen()) {
+    closeGameMenu({ restoreFocus: false });
+  }
+
   if (isDialogOpen()) {
     return;
   }
@@ -269,6 +292,182 @@ function closeResultsDialog(options = {}) {
   }
 
   lastResultsReturnFocusElement = null;
+}
+
+function formatBestTime(bestTime) {
+  return Number.isFinite(bestTime) ? `${bestTime} seconds` : '—';
+}
+
+function updateStatisticsDialog() {
+  const savedStatistics = getSavedStatistics();
+
+  document.querySelectorAll(UI_ELEMENTS.STATISTICS_CARD).forEach((card) => {
+    const difficulty = card.dataset.statisticsDifficulty;
+    const statistics = savedStatistics[difficulty];
+    if (!statistics) {
+      return;
+    }
+
+    const winRate = statistics.gamesPlayed
+      ? Math.round((statistics.gamesWon * 100) / statistics.gamesPlayed)
+      : 0;
+
+    card.querySelector('[data-stat-field="gamesPlayed"]').textContent = String(statistics.gamesPlayed);
+    card.querySelector('[data-stat-field="gamesWon"]').textContent = String(statistics.gamesWon);
+    card.querySelector('[data-stat-field="winRate"]').textContent = `${winRate}%`;
+    card.querySelector('[data-stat-field="bestTime"]').textContent = formatBestTime(statistics.bestTime);
+  });
+}
+
+function closeStatisticsDialog(options = {}) {
+  const { returnFocus = true, announce = true } = options;
+
+  if (!statisticsDialog?.open) {
+    return;
+  }
+
+  statisticsDialog.close();
+
+  if (announce) {
+    announceStatus('Statistics dialog closed.');
+  }
+
+  if (returnFocus) {
+    const focusTarget = lastStatisticsReturnFocusElement ?? gameMenuButton ?? mainButton;
+    focusTarget?.focus?.();
+  }
+
+  lastStatisticsReturnFocusElement = null;
+}
+
+function openStatisticsDialog() {
+  if (!statisticsDialog || statisticsDialog.open) {
+    return;
+  }
+
+  lastStatisticsReturnFocusElement = document.activeElement instanceof HTMLElement
+    ? document.activeElement
+    : gameMenuButton ?? mainButton;
+
+  updateStatisticsDialog();
+  statisticsDialog.showModal();
+  document.querySelector(UI_ELEMENTS.CLOSE_STATISTICS_BUTTON)?.focus();
+  announceStatus('Statistics dialog opened.');
+}
+
+function getMainMenuItems() {
+  return [
+    document.querySelector(UI_ELEMENTS.MENU_NEW_GAME_BUTTON),
+    document.querySelector(UI_ELEMENTS.MENU_INSTRUCTIONS_BUTTON),
+    document.querySelector(UI_ELEMENTS.MENU_PREFERENCES_BUTTON),
+    document.querySelector(UI_ELEMENTS.MENU_DIFFICULTY_BUTTON),
+    document.querySelector(UI_ELEMENTS.MENU_STATISTICS_BUTTON),
+  ].filter(Boolean);
+}
+
+function getDifficultyMenuItems() {
+  return Array.from(document.querySelectorAll(UI_ELEMENTS.DIFFICULTY_BUTTON));
+}
+
+function moveFocusInList(items, currentElement, direction) {
+  if (!items.length) {
+    return;
+  }
+
+  const currentIndex = items.indexOf(currentElement);
+  const nextIndex = currentIndex === -1
+    ? 0
+    : (currentIndex + direction + items.length) % items.length;
+
+  items[nextIndex]?.focus();
+}
+
+function isMenuOpen() {
+  return Boolean(gameMenuElement && !gameMenuElement.hidden);
+}
+
+function isDifficultySubmenuOpen() {
+  return Boolean(difficultySubmenuElement && !difficultySubmenuElement.hidden);
+}
+
+function closeDifficultySubmenu() {
+  if (!difficultySubmenuElement || !menuDifficultyButton) {
+    return;
+  }
+
+  difficultySubmenuElement.hidden = true;
+  menuDifficultyButton.setAttribute('aria-expanded', 'false');
+}
+
+function openDifficultySubmenu(options = {}) {
+  const { focusCurrent = false } = options;
+  if (!difficultySubmenuElement || !menuDifficultyButton) {
+    return;
+  }
+
+  difficultySubmenuElement.hidden = false;
+  menuDifficultyButton.setAttribute('aria-expanded', 'true');
+
+  if (focusCurrent) {
+    const activeDifficultyButton = getDifficultyMenuItems().find((button) => button.getAttribute('aria-checked') === 'true');
+    (activeDifficultyButton ?? getDifficultyMenuItems()[0])?.focus();
+  }
+}
+
+function openGameMenu(options = {}) {
+  const { focusTarget = 'first' } = options;
+  if (!gameMenuButton || !gameMenuElement) {
+    return;
+  }
+
+  gameMenuElement.hidden = false;
+  gameMenuButton.setAttribute('aria-expanded', 'true');
+
+  if (focusTarget === 'first') {
+    getMainMenuItems()[0]?.focus();
+  } else if (focusTarget === 'last') {
+    const items = getMainMenuItems();
+    items[items.length - 1]?.focus();
+  } else if (focusTarget instanceof HTMLElement) {
+    focusTarget.focus();
+  }
+}
+
+function closeGameMenu(options = {}) {
+  const { restoreFocus = true } = options;
+  if (!gameMenuButton || !gameMenuElement || gameMenuElement.hidden) {
+    return;
+  }
+
+  closeDifficultySubmenu();
+  gameMenuElement.hidden = true;
+  gameMenuButton.setAttribute('aria-expanded', 'false');
+
+  if (restoreFocus) {
+    gameMenuButton.focus();
+  }
+}
+
+function focusMenuShortcut(action) {
+  if (action === 'new-game') {
+    openGameMenu({ focusTarget: document.querySelector(UI_ELEMENTS.MENU_NEW_GAME_BUTTON) });
+    return;
+  }
+
+  if (action === 'instructions') {
+    openGameMenu({ focusTarget: document.querySelector(UI_ELEMENTS.MENU_INSTRUCTIONS_BUTTON) });
+    return;
+  }
+
+  if (action === 'preferences') {
+    openGameMenu({ focusTarget: document.querySelector(UI_ELEMENTS.MENU_PREFERENCES_BUTTON) });
+    return;
+  }
+
+  if (action === 'difficulty') {
+    openGameMenu({ focusTarget: document.querySelector(UI_ELEMENTS.MENU_DIFFICULTY_BUTTON) });
+    openDifficultySubmenu({ focusCurrent: true });
+  }
 }
 
 function openResultsDialog() {
@@ -611,7 +810,7 @@ function calculateResults() {
   const percentage = statistics.gamesPlayed ? Math.round((statistics.gamesWon * 100) / statistics.gamesPlayed) : 0;
   document.querySelector('.result-item:nth-child(1)').textContent = `Time: ${time} seconds`;
   document.querySelector('.result-item:nth-child(2)').textContent = `Date: ${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-  document.querySelector('.result-item:nth-child(3)').textContent = `Best time: ${statistics.bestTime}`;
+  document.querySelector('.result-item:nth-child(3)').textContent = `Best time: ${formatBestTime(statistics.bestTime)}`;
   document.querySelector('.result-item:nth-child(4)').textContent = `Games played: ${statistics.gamesPlayed}`;
   document.querySelector('.result-item:nth-child(5)').textContent = `Games won: ${statistics.gamesWon}`;
   document.querySelector('.result-item:nth-child(6)').textContent = `Games percentage: ${percentage}%`;
@@ -646,7 +845,7 @@ function getDefaultDifficultyConfig() {
 
 function setDifficulty(config) {
   updateGridConfig(config);
-  shouldFocusInstructions = true;
+  shouldFocusGameMenu = true;
   mainGrid = init(gridConfig.ROWS, gridConfig.COLS, gridConfig.MINES);
   localStorage.setItem(SYMBOLS.CONFIG, JSON.stringify(config));
   announceStatus(`Difficulty set to ${config.DIFFICULTY}.`);
@@ -660,13 +859,12 @@ function startNewGame() {
   mainGrid = init(gridConfig.ROWS, gridConfig.COLS, gridConfig.MINES);
   announceStatus(`New game started on ${gridConfig.DIFFICULTY} difficulty.`);
 
-  if (shouldFocusInstructions) {
-    const instructionsButton = document.querySelector(UI_ELEMENTS.INSTRUCTIONS_BUTTON);
-    if (instructionsButton) {
-      instructionsButton.focus();
-      announceStatus('Focus moved to instructions button.');
+  if (shouldFocusGameMenu) {
+    if (gameMenuButton) {
+      gameMenuButton.focus();
+      announceStatus('Focus moved to Game menu.');
     }
-    shouldFocusInstructions = false;
+    shouldFocusGameMenu = false;
   }
 }
 
@@ -719,9 +917,134 @@ function bindQuickAccessLinks() {
         return;
       }
 
+      if (link.dataset.focusTarget.startsWith('menu:')) {
+        focusMenuShortcut(link.dataset.focusTarget.replace('menu:', ''));
+        return;
+      }
+
       const target = document.querySelector(link.dataset.focusTarget);
       target?.focus?.();
     });
+  });
+}
+
+function bindMenuEventListeners() {
+  if (!gameMenuButton || !gameMenuElement || !menuRootElement) {
+    return;
+  }
+
+  gameMenuButton.addEventListener('click', () => {
+    if (isMenuOpen()) {
+      closeGameMenu();
+      return;
+    }
+
+    openGameMenu();
+  });
+
+  menuDifficultyButton?.addEventListener('click', () => {
+    if (isDifficultySubmenuOpen()) {
+      closeDifficultySubmenu();
+      return;
+    }
+
+    openDifficultySubmenu({ focusCurrent: true });
+  });
+
+  gameMenuButton.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      openGameMenu();
+      return;
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      openGameMenu({ focusTarget: 'last' });
+    }
+  });
+
+  gameMenuElement.addEventListener('keydown', (event) => {
+    const target = event.target;
+
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+
+    if (target.closest(UI_ELEMENTS.DIFFICULTY_SUBMENU)) {
+      const items = getDifficultyMenuItems();
+      switch (event.key) {
+        case 'ArrowDown':
+          event.preventDefault();
+          moveFocusInList(items, target, 1);
+          break;
+        case 'ArrowUp':
+          event.preventDefault();
+          moveFocusInList(items, target, -1);
+          break;
+        case 'ArrowLeft':
+          event.preventDefault();
+          closeDifficultySubmenu();
+          menuDifficultyButton?.focus();
+          break;
+        case 'Escape':
+          event.preventDefault();
+          closeGameMenu();
+          break;
+        case 'Tab':
+          closeGameMenu({ restoreFocus: false });
+          break;
+        default:
+      }
+      return;
+    }
+
+    const items = getMainMenuItems();
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        moveFocusInList(items, target, 1);
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        moveFocusInList(items, target, -1);
+        break;
+      case 'ArrowRight':
+        if (target.matches(UI_ELEMENTS.MENU_DIFFICULTY_BUTTON)) {
+          event.preventDefault();
+          openDifficultySubmenu({ focusCurrent: true });
+        }
+        break;
+      case 'Enter':
+      case ' ':
+        if (target.matches(UI_ELEMENTS.MENU_DIFFICULTY_BUTTON)) {
+          event.preventDefault();
+          openDifficultySubmenu({ focusCurrent: true });
+        }
+        break;
+      case 'Escape':
+        event.preventDefault();
+        closeGameMenu();
+        break;
+      case 'Tab':
+        closeGameMenu({ restoreFocus: false });
+        break;
+      default:
+    }
+  });
+
+  menuRootElement.addEventListener('focusout', () => {
+    requestAnimationFrame(() => {
+      if (isMenuOpen() && !menuRootElement.contains(document.activeElement)) {
+        closeGameMenu({ restoreFocus: false });
+      }
+    });
+  });
+
+  document.addEventListener('pointerdown', (event) => {
+    if (isMenuOpen() && event.target instanceof Node && !menuRootElement.contains(event.target)) {
+      closeGameMenu({ restoreFocus: false });
+    }
   });
 }
 
@@ -732,15 +1055,41 @@ function bindStaticEventListeners() {
   const newGameButton = document.querySelector(UI_ELEMENTS.NEW_GAME_BUTTON);
   if (newGameButton) {
     newGameButton.addEventListener('click', () => {
-      shouldFocusInstructions = true;
+      shouldFocusGameMenu = true;
       startNewGame();
     });
   }
+
+  document.querySelector(UI_ELEMENTS.MENU_NEW_GAME_BUTTON)?.addEventListener('click', () => {
+    closeGameMenu({ restoreFocus: false });
+    startNewGame();
+    focusBoard();
+  });
+
+  document.querySelector(UI_ELEMENTS.MENU_INSTRUCTIONS_BUTTON)?.addEventListener('click', () => {
+    closeGameMenu({ restoreFocus: false });
+    gameMenuButton?.focus();
+    openInstructionsDialog();
+  });
+
+  document.querySelector(UI_ELEMENTS.MENU_PREFERENCES_BUTTON)?.addEventListener('click', () => {
+    closeGameMenu({ restoreFocus: false });
+    gameMenuButton?.focus();
+    openPreferencesDialog();
+  });
+
+  document.querySelector(UI_ELEMENTS.MENU_STATISTICS_BUTTON)?.addEventListener('click', () => {
+    closeGameMenu({ restoreFocus: false });
+    gameMenuButton?.focus();
+    openStatisticsDialog();
+  });
 
   const closeResultsButton = document.querySelector(UI_ELEMENTS.CLOSE_RESULTS_BUTTON);
   if (closeResultsButton) {
     closeResultsButton.addEventListener('click', () => closeResultsDialog());
   }
+
+  document.querySelector(UI_ELEMENTS.CLOSE_STATISTICS_BUTTON)?.addEventListener('click', () => closeStatisticsDialog());
 
   highlightElement.addEventListener('click', () => inspect(mainGrid, highlightY, highlightX));
   highlightElement.addEventListener('contextmenu', (event) => {
@@ -749,15 +1098,11 @@ function bindStaticEventListeners() {
   });
   bindKeyboardActivation(highlightElement, () => inspect(mainGrid, highlightY, highlightX));
 
-  const instructionsButton = document.querySelector(UI_ELEMENTS.INSTRUCTIONS_BUTTON);
-  if (instructionsButton) {
-    instructionsButton.addEventListener('click', openInstructionsDialog);
-  }
-
   document.querySelectorAll(UI_ELEMENTS.DIFFICULTY_BUTTON).forEach((button) => {
     button.addEventListener('click', () => {
       const config = getDifficultyConfig(button.dataset.difficulty);
       if (config) {
+        closeGameMenu({ restoreFocus: false });
         setDifficulty(config);
       }
     });
@@ -788,18 +1133,23 @@ function bindStaticEventListeners() {
     event.preventDefault();
     closeResultsDialog();
   });
+
+  statisticsDialog?.addEventListener('cancel', (event) => {
+    event.preventDefault();
+    closeStatisticsDialog();
+  });
 }
 
 function updateGridConfig(config) {
   const buttons = document.querySelectorAll(UI_ELEMENTS.DIFFICULTY_BUTTON);
   buttons.forEach((button) => {
     button.classList.remove(CSS_CLASSES.ACTIVE);
-    button.setAttribute('aria-pressed', 'false');
+    button.setAttribute('aria-checked', 'false');
   });
 
   const difficultyButton = document.querySelector(`[data-difficulty="${config.DIFFICULTY}"]`);
   difficultyButton.classList.add(CSS_CLASSES.ACTIVE);
-  difficultyButton.setAttribute('aria-pressed', 'true');
+  difficultyButton.setAttribute('aria-checked', 'true');
 
   gridConfig = config;
   rows = config.ROWS ?? config.rows;
@@ -848,7 +1198,13 @@ document.addEventListener('DOMContentLoaded', function() {
   liveStatusElement = document.querySelector(UI_ELEMENTS.LIVE_STATUS);
   liveAlertElement = document.querySelector(UI_ELEMENTS.LIVE_ALERT);
   highlightElement = document.querySelector(UI_ELEMENTS.HIGHLIGHT_ELEMENT);
+  gameMenuButton = document.querySelector(UI_ELEMENTS.GAME_MENU_BUTTON);
+  gameMenuElement = document.querySelector(UI_ELEMENTS.GAME_MENU);
+  menuRootElement = document.querySelector(UI_ELEMENTS.MENU_ROOT);
+  menuDifficultyButton = document.querySelector(UI_ELEMENTS.MENU_DIFFICULTY_BUTTON);
+  difficultySubmenuElement = document.querySelector(UI_ELEMENTS.DIFFICULTY_SUBMENU);
   resultsDialog = document.querySelector(UI_ELEMENTS.RESULTS_DIALOG);
+  statisticsDialog = document.querySelector(UI_ELEMENTS.STATISTICS_DIALOG);
   const closeInstructionsButton = document.querySelector(UI_ELEMENTS.CLOSE_INSTRUCTIONS_BUTTON);
 
   if (closeInstructionsButton) {
@@ -861,6 +1217,7 @@ document.addEventListener('DOMContentLoaded', function() {
     closeInstructionsDialog();
   });
 
+  bindMenuEventListeners();
   bindStaticEventListeners();
   bindQuickAccessLinks();
 
@@ -869,7 +1226,7 @@ document.addEventListener('DOMContentLoaded', function() {
   announceStatus(`Game ready on ${gridConfig.DIFFICULTY} difficulty. Use arrow keys to navigate.`);
 
   document.addEventListener('keydown', function(event) {
-    if (event.defaultPrevented || isDialogOpen()) {
+    if (event.defaultPrevented || isDialogOpen() || isMenuOpen()) {
       return;
     }
 

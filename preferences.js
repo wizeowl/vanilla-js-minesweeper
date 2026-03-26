@@ -15,7 +15,7 @@ const ANNOUNCEMENT_LEVELS = {
 };
 
 const PREFERENCE_UI = {
-  BUTTON: '.preferences-button',
+  BUTTON: '#menu-preferences',
   DIALOG: '.preferences-dialog',
   CLOSE_BUTTON: '.close-preferences-button',
   HAPTICS_TOGGLE: '.preference-haptics-toggle',
