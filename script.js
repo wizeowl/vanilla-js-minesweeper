@@ -18,21 +18,23 @@ const UI_ELEMENTS = {
   GAME_MENU: '#game-menu',
   MENU_ROOT: '.menu-root',
   MENU_NEW_GAME_BUTTON: '#menu-new-game',
-  MENU_INSTRUCTIONS_BUTTON: '#menu-instructions',
+  MENU_KEYBOARD_CONTROLS_BUTTON: '#menu-keyboard-controls',
+  MENU_TOUCH_CONTROLS_BUTTON: '#menu-touch-controls',
   MENU_PREFERENCES_BUTTON: '#menu-preferences',
   MENU_DIFFICULTY_BUTTON: '#menu-difficulty-button',
   DIFFICULTY_SUBMENU: '#difficulty-submenu',
   MENU_STATISTICS_BUTTON: '#menu-statistics',
   HIGHLIGHT_ELEMENT: '.grid-item-highlight',
   DIFFICULTY_BUTTON: '.menu-difficulty-item',
-  INSTRUCTIONS_DIALOG: 'dialog.instruction-dialog',
-  CLOSE_INSTRUCTIONS_BUTTON: '.close-instructions-button',
+  KEYBOARD_CONTROLS_DIALOG: 'dialog.keyboard-controls-dialog',
+  CLOSE_KEYBOARD_CONTROLS_BUTTON: '.close-keyboard-controls-button',
+  TOUCH_CONTROLS_DIALOG: 'dialog.touch-controls-dialog',
+  CLOSE_TOUCH_CONTROLS_BUTTON: '.close-touch-controls-button',
   SHORTCUT_DIALOG: 'dialog.shortcut-dialog',
-  REVEAL_INSTRUCTION: '.instruction.REVEAL',
-  FLAG_INSTRUCTION: '.instruction.FLAG',
-  REVEAL_AROUND_INSTRUCTION: '.instruction.REVEAL_AROUND',
-  INSTRUCTIONS_BUTTON: '#menu-instructions',
-  SHORTCUT_INSTRUCTION: '.instruction[data-action]',
+  KEYBOARD_CONTROLS_BUTTON: '#menu-keyboard-controls',
+  TOUCH_CONTROLS_BUTTON: '#menu-touch-controls',
+  SHORTCUT_VALUE: '[data-shortcut-value]',
+  SHORTCUT_CHANGE_BUTTON: '.shortcut-change-button[data-edit-shortcut]',
   LIVE_STATUS: '.a11y-live-status',
   LIVE_ALERT: '.a11y-live-alert',
   QUICK_ACCESS_LINK: '.quick-access [data-focus-target]',
@@ -358,7 +360,8 @@ function openStatisticsDialog() {
 function getMainMenuItems() {
   return [
     document.querySelector(UI_ELEMENTS.MENU_NEW_GAME_BUTTON),
-    document.querySelector(UI_ELEMENTS.MENU_INSTRUCTIONS_BUTTON),
+    document.querySelector(UI_ELEMENTS.MENU_KEYBOARD_CONTROLS_BUTTON),
+    document.querySelector(UI_ELEMENTS.MENU_TOUCH_CONTROLS_BUTTON),
     document.querySelector(UI_ELEMENTS.MENU_PREFERENCES_BUTTON),
     document.querySelector(UI_ELEMENTS.MENU_DIFFICULTY_BUTTON),
     document.querySelector(UI_ELEMENTS.MENU_STATISTICS_BUTTON),
@@ -454,8 +457,13 @@ function focusMenuShortcut(action) {
     return;
   }
 
-  if (action === 'instructions') {
-    openGameMenu({ focusTarget: document.querySelector(UI_ELEMENTS.MENU_INSTRUCTIONS_BUTTON) });
+  if (action === 'instructions' || action === 'keyboard-controls') {
+    openGameMenu({ focusTarget: document.querySelector(UI_ELEMENTS.MENU_KEYBOARD_CONTROLS_BUTTON) });
+    return;
+  }
+
+  if (action === 'touch-controls') {
+    openGameMenu({ focusTarget: document.querySelector(UI_ELEMENTS.MENU_TOUCH_CONTROLS_BUTTON) });
     return;
   }
 
@@ -1066,10 +1074,16 @@ function bindStaticEventListeners() {
     focusBoard();
   });
 
-  document.querySelector(UI_ELEMENTS.MENU_INSTRUCTIONS_BUTTON)?.addEventListener('click', () => {
+  document.querySelector(UI_ELEMENTS.MENU_KEYBOARD_CONTROLS_BUTTON)?.addEventListener('click', () => {
     closeGameMenu({ restoreFocus: false });
     gameMenuButton?.focus();
-    openInstructionsDialog();
+    openKeyboardControlsDialog();
+  });
+
+  document.querySelector(UI_ELEMENTS.MENU_TOUCH_CONTROLS_BUTTON)?.addEventListener('click', () => {
+    closeGameMenu({ restoreFocus: false });
+    gameMenuButton?.focus();
+    openTouchControlsDialog();
   });
 
   document.querySelector(UI_ELEMENTS.MENU_PREFERENCES_BUTTON)?.addEventListener('click', () => {
@@ -1108,11 +1122,12 @@ function bindStaticEventListeners() {
     });
   });
 
-  document.querySelectorAll(UI_ELEMENTS.SHORTCUT_INSTRUCTION).forEach((element) => {
+  document.querySelectorAll(UI_ELEMENTS.SHORTCUT_CHANGE_BUTTON).forEach((element) => {
     const openShortcutEditor = () => {
-      const action = element.dataset.action;
-      if (action && ACTIONS[action]) {
-        editShortcut(element, ACTIONS[action]);
+      const action = element.dataset.editShortcut;
+      const displayElement = element.closest('.keyboard-control-row')?.querySelector(UI_ELEMENTS.SHORTCUT_VALUE);
+      if (action && ACTIONS[action] && displayElement instanceof HTMLElement) {
+        editShortcut(element, displayElement, ACTIONS[action]);
       }
     };
 
@@ -1205,16 +1220,27 @@ document.addEventListener('DOMContentLoaded', function() {
   difficultySubmenuElement = document.querySelector(UI_ELEMENTS.DIFFICULTY_SUBMENU);
   resultsDialog = document.querySelector(UI_ELEMENTS.RESULTS_DIALOG);
   statisticsDialog = document.querySelector(UI_ELEMENTS.STATISTICS_DIALOG);
-  const closeInstructionsButton = document.querySelector(UI_ELEMENTS.CLOSE_INSTRUCTIONS_BUTTON);
+  const closeKeyboardControlsButton = document.querySelector(UI_ELEMENTS.CLOSE_KEYBOARD_CONTROLS_BUTTON);
+  const closeTouchControlsButton = document.querySelector(UI_ELEMENTS.CLOSE_TOUCH_CONTROLS_BUTTON);
 
-  if (closeInstructionsButton) {
-    closeInstructionsButton.addEventListener('click', closeInstructionsDialog);
-    bindKeyboardActivation(closeInstructionsButton, closeInstructionsDialog);
+  if (closeKeyboardControlsButton) {
+    closeKeyboardControlsButton.addEventListener('click', closeKeyboardControlsDialog);
+    bindKeyboardActivation(closeKeyboardControlsButton, closeKeyboardControlsDialog);
   }
 
-  document.querySelector(UI_ELEMENTS.INSTRUCTIONS_DIALOG)?.addEventListener('cancel', (event) => {
+  if (closeTouchControlsButton) {
+    closeTouchControlsButton.addEventListener('click', closeTouchControlsDialog);
+    bindKeyboardActivation(closeTouchControlsButton, closeTouchControlsDialog);
+  }
+
+  document.querySelector(UI_ELEMENTS.KEYBOARD_CONTROLS_DIALOG)?.addEventListener('cancel', (event) => {
     event.preventDefault();
-    closeInstructionsDialog();
+    closeKeyboardControlsDialog();
+  });
+
+  document.querySelector(UI_ELEMENTS.TOUCH_CONTROLS_DIALOG)?.addEventListener('cancel', (event) => {
+    event.preventDefault();
+    closeTouchControlsDialog();
   });
 
   bindMenuEventListeners();

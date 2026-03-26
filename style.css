@@ -1,6 +1,10 @@
 :root {
     --cell-size: 23px;
     --utility-button-width: min(360px, calc(100vw - 32px));
+    --scrollbar-track-color: #d4d0c8;
+    --scrollbar-thumb-color: #9a9a9a;
+    --scrollbar-thumb-hover-color: #858585;
+    --scrollbar-thumb-active-color: #6f6f6f;
 }
 
 body {
@@ -651,7 +655,7 @@ main {
 }
 
 
-.instruction-dialog,
+.controls-dialog,
 .preferences-dialog,
 .shortcut-dialog,
 .statistics-dialog {
@@ -664,7 +668,7 @@ main {
     box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.35);
 }
 
-.instruction-dialog,
+.controls-dialog,
 .preferences-dialog {
     padding: 0;
     border: none;
@@ -672,21 +676,21 @@ main {
     overflow: visible;
 }
 
-.instruction-dialog::backdrop,
+.controls-dialog::backdrop,
 .preferences-dialog::backdrop,
 .shortcut-dialog::backdrop,
 .statistics-dialog::backdrop {
     background: rgba(0, 0, 0, 0.25);
 }
 
-.instruction-dialog h2,
+.controls-dialog h2,
 .preferences-dialog h2,
 .shortcut-dialog h2,
 .statistics-dialog h2 {
     margin: 0 0 12px;
 }
 
-.instruction-dialog .dialog-window-shell,
+.controls-dialog .dialog-window-shell,
 .preferences-dialog .dialog-window-shell {
     position: relative;
     overflow: hidden;
@@ -722,26 +726,180 @@ main {
     background: #c0c0c0;
 }
 
-.instruction-dialog .dialog-window-body {
+body,
+.dialog-window-body,
+.statistics-dialog {
+    scrollbar-width: auto;
+    scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color);
+}
+
+.dialog-window-body {
+    scrollbar-gutter: stable;
+}
+
+body::-webkit-scrollbar,
+.dialog-window-body::-webkit-scrollbar,
+.statistics-dialog::-webkit-scrollbar {
+    width: 16px;
+    height: 16px;
+}
+
+body::-webkit-scrollbar-track,
+.dialog-window-body::-webkit-scrollbar-track,
+.statistics-dialog::-webkit-scrollbar-track {
+    background: var(--scrollbar-track-color);
+    box-shadow: inset 1px 1px 0 #808080, inset -1px -1px 0 #fff;
+}
+
+body::-webkit-scrollbar-thumb,
+.dialog-window-body::-webkit-scrollbar-thumb,
+.statistics-dialog::-webkit-scrollbar-thumb {
+    min-height: 34px;
+    border: 2px solid transparent;
+    background-color: var(--scrollbar-thumb-color);
+    background-clip: padding-box;
+    box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #404040;
+}
+
+body::-webkit-scrollbar-thumb:hover,
+.dialog-window-body::-webkit-scrollbar-thumb:hover,
+.statistics-dialog::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar-thumb-hover-color);
+}
+
+body::-webkit-scrollbar-thumb:active,
+.dialog-window-body::-webkit-scrollbar-thumb:active,
+.statistics-dialog::-webkit-scrollbar-thumb:active {
+    background-color: var(--scrollbar-thumb-active-color);
+}
+
+body::-webkit-scrollbar-corner,
+.dialog-window-body::-webkit-scrollbar-corner,
+.statistics-dialog::-webkit-scrollbar-corner {
+    background: var(--scrollbar-track-color);
+}
+
+.controls-dialog .dialog-window-body {
     max-height: min(70vh, 720px);
     overflow: auto;
 }
 
-.instruction-dialog .instructions {
-    padding-top: 2px;
+.keyboard-controls-summary {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 10px 12px;
+    background: #dfdfdf;
+    border-top: 2px solid #fff;
+    border-left: 2px solid #fff;
+    border-right: 2px solid #808080;
+    border-bottom: 2px solid #808080;
 }
 
-.instruction-dialog .instructions ol {
+.keyboard-controls-summary p {
     margin: 0;
-    padding-left: 20px;
 }
 
-.instruction-dialog .instructions ul {
-    margin: 8px 0 0;
-    padding-left: 20px;
+.keyboard-controls-panel {
+    min-width: min(520px, calc(100vw - 96px));
+    background: #c0c0c0;
+    border-top: 2px solid #808080;
+    border-left: 2px solid #808080;
+    border-right: 2px solid #fff;
+    border-bottom: 2px solid #fff;
 }
 
-.instruction-dialog p,
+.keyboard-controls-header,
+.keyboard-control-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 88px 64px;
+    gap: 12px;
+    align-items: center;
+    padding: 8px 10px;
+}
+
+.keyboard-controls-header {
+    font-size: 13px;
+    font-weight: 700;
+    background: #d4d0c8;
+    border-bottom: 1px solid #808080;
+}
+
+.keyboard-control-row {
+    border-top: 1px solid #fff;
+}
+
+.keyboard-control-row + .keyboard-control-row {
+    border-top: 1px solid #808080;
+}
+
+.keyboard-control-label {
+    line-height: 1.3;
+}
+
+.shortcut-value {
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    background: #fff;
+    border-top: 2px solid #808080;
+    border-left: 2px solid #808080;
+    border-right: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    font: inherit;
+    font-weight: 700;
+    color: #111;
+}
+
+.shortcut-change-button {
+    min-width: 40px;
+    min-height: 32px;
+    justify-self: end;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    border-top: 2px solid #fff;
+    border-left: 2px solid #fff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    background: #c0c0c0;
+    color: #111;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.shortcut-change-button:active {
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    transform: translate(1px, 1px);
+}
+
+.touch-controls-list {
+    display: grid;
+    gap: 12px;
+    min-width: min(360px, calc(100vw - 96px));
+}
+
+.touch-control-row {
+    display: grid;
+    grid-template-columns: 100px minmax(0, 1fr);
+    gap: 12px;
+    padding: 10px 12px;
+    background: #dfdfdf;
+    border-top: 2px solid #fff;
+    border-left: 2px solid #fff;
+    border-right: 2px solid #808080;
+    border-bottom: 2px solid #808080;
+}
+
+.controls-dialog p,
 .preferences-dialog p,
 .shortcut-dialog p,
 .statistics-dialog p {
@@ -842,9 +1000,10 @@ main {
 .instructions-button:focus-visible,
 .preferences-button:focus-visible,
 .quick-access a:focus-visible,
-.instruction:focus-visible,
+.shortcut-change-button:focus-visible,
 .preferences-dialog input[type="checkbox"]:focus-visible,
-.close-instructions-button:focus-visible,
+.close-keyboard-controls-button:focus-visible,
+.close-touch-controls-button:focus-visible,
 .close-preferences-button:focus-visible,
 .close-results-button:focus-visible,
 .close-statistics-button:focus-visible {
@@ -896,7 +1055,8 @@ main {
     }
 }
 
-.close-instructions-button,
+.close-keyboard-controls-button,
+.close-touch-controls-button,
 .close-preferences-button,
 .close-results-button,
 .close-statistics-button {
@@ -918,7 +1078,8 @@ main {
     line-height: 1;
 }
 
-.close-instructions-button,
+.close-keyboard-controls-button,
+.close-touch-controls-button,
 .close-preferences-button {
     position: static;
     width: 20px;
@@ -929,7 +1090,8 @@ main {
     z-index: 2;
 }
 
-.close-instructions-button:active,
+.close-keyboard-controls-button:active,
+.close-touch-controls-button:active,
 .close-preferences-button:active,
 .close-results-button:active,
 .close-statistics-button:active {
@@ -937,25 +1099,6 @@ main {
     transform: translate(1px, 1px);
 }
 
-
-.instruction {
-    min-width: 30px;
-    height: 30px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    background-image: url("assets/closed.svg");
-    background-size: 100%;
-    text-align: center;
-    border: none;
-    padding: 0 4px;
-    background-color: transparent;
-    color: #111;
-    font: inherit;
-    font-weight: 700;
-    font-size: 16px;
-}
 
 .grid-item-highlight {
     border: none;
@@ -1017,7 +1160,7 @@ main {
         width: calc(100vw - 16px);
     }
 
-    .instruction-dialog,
+    .controls-dialog,
     .preferences-dialog,
     .shortcut-dialog,
     .statistics-dialog {
@@ -1026,7 +1169,7 @@ main {
         padding-right: 60px;
     }
 
-    .instruction-dialog,
+    .controls-dialog,
     .preferences-dialog {
         padding: 0;
     }
@@ -1035,10 +1178,25 @@ main {
         padding: 16px;
     }
 
-    .instruction {
-        min-width: 34px;
-        height: 34px;
-        font-size: 17px;
+    .keyboard-controls-panel,
+    .touch-controls-list {
+        min-width: 0;
+    }
+
+    .keyboard-controls-header,
+    .keyboard-control-row,
+    .touch-control-row {
+        grid-template-columns: minmax(0, 1fr) 76px 52px;
+        gap: 8px;
+    }
+
+    .touch-control-row {
+        grid-template-columns: 88px minmax(0, 1fr);
+    }
+
+    .shortcut-value,
+    .shortcut-change-button {
+        min-height: 34px;
     }
 
     .statistics-cards {
@@ -1057,12 +1215,13 @@ main {
     .instructions-button:focus-visible,
     .preferences-button:focus-visible,
     .quick-access a:focus-visible,
-    .instruction:focus-visible,
+    .shortcut-change-button:focus-visible,
     .preferences-dialog input[type="checkbox"]:focus-visible,
-    .close-instructions-button:focus-visible,
+    .close-keyboard-controls-button:focus-visible,
+    .close-touch-controls-button:focus-visible,
     .close-preferences-button:focus-visible,
     .close-results-button:focus-visible,
-.close-statistics-button:focus-visible {
+    .close-statistics-button:focus-visible {
         outline: 3px solid #000;
     }
 }

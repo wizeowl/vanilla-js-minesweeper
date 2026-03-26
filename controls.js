@@ -5,60 +5,168 @@ const ACTIONS = {
   FLAG: 'FLAG',
 };
 
-let instructionsDialogReturnFocusElement = null;
+let keyboardControlsDialogReturnFocusElement = null;
+let touchControlsDialogReturnFocusElement = null;
 let shortcutDialogReturnFocusElement = null;
 
-function openInstructionsDialog() {
-  const instructionsDialog = document.querySelector(UI_ELEMENTS.INSTRUCTIONS_DIALOG);
-  if (!instructionsDialog || instructionsDialog.open) {
+function getActionLabel(action) {
+  switch (action) {
+    case ACTIONS.REVEAL:
+      return 'Reveal selected cell';
+    case ACTIONS.FLAG:
+      return 'Flag or unflag a mine';
+    case ACTIONS.REVEAL_AROUND:
+      return 'Reveal surrounding cells';
+    default:
+      return action;
+  }
+}
+
+function formatShortcutLabel(shortcut) {
+  if (!shortcut) {
+    return '—';
+  }
+
+  if (shortcut === ' ') {
+    return 'Space';
+  }
+
+  if (shortcut.startsWith('Arrow')) {
+    return shortcut.replace('Arrow', 'Arrow ');
+  }
+
+  return shortcut.length === 1 ? shortcut.toUpperCase() : shortcut;
+}
+
+function normalizeShortcutKey(key) {
+  return key.length === 1 ? key.toLowerCase() : key;
+}
+
+function isReservedShortcutKey(key) {
+  return [
+    'Escape',
+    'Enter',
+    'Tab',
+    'ArrowUp',
+    'ArrowDown',
+    'ArrowLeft',
+    'ArrowRight',
+    'Shift',
+    'Control',
+    'Alt',
+    'Meta',
+  ].includes(key);
+}
+
+function syncShortcutDisplays() {
+  document.querySelectorAll(UI_ELEMENTS.SHORTCUT_VALUE).forEach((element) => {
+    const action = element.dataset.shortcutValue;
+    if (!action || !ACTIONS[action]) {
+      return;
+    }
+
+    const shortcut = getShortcut(ACTIONS[action]);
+    const label = formatShortcutLabel(shortcut);
+    element.textContent = label;
+    element.setAttribute('aria-label', `Current shortcut: ${label}`);
+  });
+}
+
+function openKeyboardControlsDialog() {
+  const keyboardControlsDialog = document.querySelector(UI_ELEMENTS.KEYBOARD_CONTROLS_DIALOG);
+  if (!keyboardControlsDialog || keyboardControlsDialog.open) {
     return;
   }
 
-  instructionsDialogReturnFocusElement = document.activeElement instanceof HTMLElement
+  keyboardControlsDialogReturnFocusElement = document.activeElement instanceof HTMLElement
     ? document.activeElement
-    : document.querySelector(UI_ELEMENTS.INSTRUCTIONS_BUTTON);
+    : document.querySelector(UI_ELEMENTS.KEYBOARD_CONTROLS_BUTTON);
 
-  instructionsDialog.showModal();
-  document.querySelector(UI_ELEMENTS.CLOSE_INSTRUCTIONS_BUTTON)?.focus();
-  document.querySelector(UI_ELEMENTS.REVEAL_INSTRUCTION).textContent = getShortcut(ACTIONS.REVEAL);
-  document.querySelector(UI_ELEMENTS.FLAG_INSTRUCTION).textContent = getShortcut(ACTIONS.FLAG);
-  document.querySelector(UI_ELEMENTS.REVEAL_AROUND_INSTRUCTION).textContent = getShortcut(ACTIONS.REVEAL_AROUND);
+  syncShortcutDisplays();
+  keyboardControlsDialog.showModal();
+  document.querySelector(UI_ELEMENTS.CLOSE_KEYBOARD_CONTROLS_BUTTON)?.focus();
   if (typeof announceStatus === 'function') {
-    announceStatus('Instructions dialog opened.');
+    announceStatus('Keyboard controls dialog opened.');
   }
 }
 
-function closeInstructionsDialog() {
-  const instructionsDialog = document.querySelector(UI_ELEMENTS.INSTRUCTIONS_DIALOG);
-  if (!instructionsDialog?.open) {
+function closeKeyboardControlsDialog() {
+  const keyboardControlsDialog = document.querySelector(UI_ELEMENTS.KEYBOARD_CONTROLS_DIALOG);
+  if (!keyboardControlsDialog?.open) {
     return;
   }
 
-  instructionsDialog.close();
-  (instructionsDialogReturnFocusElement ?? document.querySelector(UI_ELEMENTS.INSTRUCTIONS_BUTTON))?.focus?.();
-  instructionsDialogReturnFocusElement = null;
+  keyboardControlsDialog.close();
+  (keyboardControlsDialogReturnFocusElement ?? document.querySelector(UI_ELEMENTS.KEYBOARD_CONTROLS_BUTTON))?.focus?.();
+  keyboardControlsDialogReturnFocusElement = null;
   if (typeof announceStatus === 'function') {
-    announceStatus('Instructions dialog closed.');
+    announceStatus('Keyboard controls dialog closed.');
   }
 }
 
-function editShortcut(element, action) {
+function openTouchControlsDialog() {
+  const touchControlsDialog = document.querySelector(UI_ELEMENTS.TOUCH_CONTROLS_DIALOG);
+  if (!touchControlsDialog || touchControlsDialog.open) {
+    return;
+  }
+
+  touchControlsDialogReturnFocusElement = document.activeElement instanceof HTMLElement
+    ? document.activeElement
+    : document.querySelector(UI_ELEMENTS.TOUCH_CONTROLS_BUTTON);
+
+  touchControlsDialog.showModal();
+  document.querySelector(UI_ELEMENTS.CLOSE_TOUCH_CONTROLS_BUTTON)?.focus();
+  if (typeof announceStatus === 'function') {
+    announceStatus('Touch controls dialog opened.');
+  }
+}
+
+function closeTouchControlsDialog() {
+  const touchControlsDialog = document.querySelector(UI_ELEMENTS.TOUCH_CONTROLS_DIALOG);
+  if (!touchControlsDialog?.open) {
+    return;
+  }
+
+  touchControlsDialog.close();
+  (touchControlsDialogReturnFocusElement ?? document.querySelector(UI_ELEMENTS.TOUCH_CONTROLS_BUTTON))?.focus?.();
+  touchControlsDialogReturnFocusElement = null;
+  if (typeof announceStatus === 'function') {
+    announceStatus('Touch controls dialog closed.');
+  }
+}
+
+function editShortcut(triggerElement, displayElement, action) {
   const shortcutDialog = document.querySelector(UI_ELEMENTS.SHORTCUT_DIALOG);
-  if (shortcutDialog.open) {
+  if (!shortcutDialog || shortcutDialog.open) {
     return;
   }
 
-  shortcutDialogReturnFocusElement = element;
+  shortcutDialogReturnFocusElement = triggerElement;
+  const actionLabel = getActionLabel(action);
+  const shortcutDialogDescription = shortcutDialog.querySelector('#shortcut-dialog-description');
+  if (shortcutDialogDescription) {
+    shortcutDialogDescription.textContent = `Press a key for ${actionLabel}. Press Escape to cancel.`;
+  }
 
   const cleanup = () => {
     shortcutDialog.removeEventListener('keydown', handleNewShortcut);
     shortcutDialog.removeEventListener('close', cleanup);
-    shortcutDialog.removeEventListener('cancel', cleanup);
+    shortcutDialog.removeEventListener('cancel', handleCancel);
   };
 
-  shortcutDialog.addEventListener('keydown', handleNewShortcut, { once: true });
+  const handleCancel = (event) => {
+    event.preventDefault();
+    shortcutDialog.close('cancel');
+    shortcutDialogReturnFocusElement?.focus?.();
+    shortcutDialogReturnFocusElement = null;
+    if (typeof announceStatus === 'function') {
+      announceStatus('Shortcut editor closed.');
+    }
+  };
+
+  shortcutDialog.addEventListener('keydown', handleNewShortcut);
   shortcutDialog.addEventListener('close', cleanup, { once: true });
-  shortcutDialog.addEventListener('cancel', cleanup, { once: true });
+  shortcutDialog.addEventListener('cancel', handleCancel);
   shortcutDialog.showModal();
   shortcutDialog.focus();
   if (typeof announceStatus === 'function') {
@@ -66,14 +174,29 @@ function editShortcut(element, action) {
   }
 
   function handleNewShortcut(event) {
-    const newShortCut = event.key;
-    element.textContent = newShortCut;
-
-    saveShortcut(action, newShortCut);
-    if (typeof announceStatus === 'function') {
-      announceStatus(`${action} shortcut set to ${newShortCut}.`);
+    if (event.key === 'Escape') {
+      return;
     }
-    shortcutDialog.close();
+
+    if (isReservedShortcutKey(event.key)) {
+      if (typeof announceStatus === 'function') {
+        announceStatus(`${formatShortcutLabel(event.key)} is reserved and cannot be assigned.`);
+      }
+      return;
+    }
+
+    event.preventDefault();
+
+    const newShortcut = normalizeShortcutKey(event.key);
+    const shortcutLabel = formatShortcutLabel(newShortcut);
+    displayElement.textContent = shortcutLabel;
+    displayElement.setAttribute('aria-label', `Current shortcut: ${shortcutLabel}`);
+
+    saveShortcut(action, newShortcut);
+    if (typeof announceStatus === 'function') {
+      announceStatus(`${actionLabel} shortcut set to ${shortcutLabel}.`);
+    }
+    shortcutDialog.close('saved');
     shortcutDialogReturnFocusElement?.focus?.();
     shortcutDialogReturnFocusElement = null;
   }

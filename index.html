@@ -18,7 +18,8 @@
 <nav class="quick-access" aria-label="Quick access">
   <a href="#game-menu-button" data-focus-target="#game-menu-button">Skip to game menu</a>
   <a href="#menu-new-game" data-focus-target="menu:new-game">Skip to new game</a>
-  <a href="#menu-instructions" data-focus-target="menu:instructions">Skip to instructions</a>
+  <a href="#menu-keyboard-controls" data-focus-target="menu:keyboard-controls">Skip to keyboard controls</a>
+  <a href="#menu-touch-controls" data-focus-target="menu:touch-controls">Skip to touch controls</a>
   <a href="#menu-preferences" data-focus-target="menu:preferences">Skip to preferences</a>
   <a href="#difficulty-beginner" data-focus-target="menu:difficulty">Skip to difficulty</a>
   <a href="#game-board" data-focus-target="board">Skip to game board</a>
@@ -48,7 +49,8 @@
           <div id="game-menu" class="menu-popup" role="menu" hidden>
             <button type="button" id="menu-new-game" class="menu-item" role="menuitem">New game</button>
             <div class="menu-separator" role="separator"></div>
-            <button type="button" id="menu-instructions" class="menu-item" role="menuitem">Instructions</button>
+            <button type="button" id="menu-keyboard-controls" class="menu-item" role="menuitem">Keyboard Controls</button>
+            <button type="button" id="menu-touch-controls" class="menu-item" role="menuitem">Touch Controls</button>
             <button type="button" id="menu-preferences" class="menu-item" role="menuitem">Preferences</button>
             <div class="menu-submenu">
               <button
@@ -167,59 +169,65 @@
     </section>
   </div>
 </dialog>
-<dialog class="instruction-dialog" aria-labelledby="instruction-dialog-title" aria-describedby="instruction-dialog-description" aria-modal="true">
+<dialog class="keyboard-controls-dialog controls-dialog" aria-labelledby="keyboard-controls-dialog-title" aria-describedby="keyboard-controls-dialog-description" aria-modal="true">
   <div class="dialog-window-shell">
     <div class="dialog-window-titlebar">
-      <h2 id="instruction-dialog-title">Instructions for Keyboard Gameplay</h2>
-      <button type="button" class="close-instructions-button" aria-label="Close instructions"></button>
+      <h2 id="keyboard-controls-dialog-title">Keyboard Controls</h2>
+      <button type="button" class="close-keyboard-controls-button" aria-label="Close keyboard controls"></button>
     </div>
     <div class="dialog-window-body">
-      <p id="instruction-dialog-description" class="sr-only">Read controls and edit keyboard shortcuts for reveal, flag and reveal around actions.</p>
-      <div class="instructions">
-        <ol>
-          <li><strong>Starting a New Game:</strong>
-            <ul>
-              <li>Press the Enter key to start a new game.</li>
-            </ul>
-          </li>
-          <li><strong>Navigation:</strong>
-            <ul>
-              <li>Use the arrow keys (Up, Down, Left, Right) to navigate the grid.</li>
-              <li>Move the cursor to the desired cell.</li>
-            </ul>
-          </li>
-          <li><strong>Revealing Cells:</strong>
-            <ul>
-              <li>Press the '<button type="button" class="instruction REVEAL" data-action="REVEAL" aria-label="Edit reveal shortcut">c</button>' key to reveal the content of the highlighted cell.</li>
-              <li>Be cautious! Revealing a mine will end the game.</li>
-            </ul>
-          </li>
-          <li><strong>Flagging Mines:</strong>
-            <ul>
-              <li>Press the '<button type="button" class="instruction FLAG" data-action="FLAG" aria-label="Edit flag shortcut">w</button>' key to flag/unflag a suspected mine.</li>
-              <li>Use flags to mark cells that you believe contain mines.</li>
-            </ul>
-          </li>
-          <li><strong>Double Click Action:</strong>
-            <ul>
-              <li>Double-click on a cell to reveal adjacent cells if the neighboring mines are correctly flagged around it.</li>
-              <li>Press the '<button type="button" class="instruction REVEAL_AROUND" data-action="REVEAL_AROUND" aria-label="Edit reveal around shortcut">x</button>' reveal around the highlighted cell.</li>
-            </ul>
-          </li>
-          <li><strong>Touch Controls (Mobile/Tablets):</strong>
-            <ul>
-              <li>Tap a cell to reveal it.</li>
-              <li>Long-press a cell to place or remove a flag.</li>
-              <li>Double-tap a revealed cell to reveal surrounding cells.</li>
-            </ul>
-          </li>
-          <li><strong>Winning the Game:</strong>
-            <ul>
-              <li>Successfully reveal all non-mine cells to win the game.</li>
-              <li>Use logic and strategy to uncover safe cells without triggering mines.</li>
-            </ul>
-          </li>
-        </ol>
+      <p id="keyboard-controls-dialog-description">Review the fixed keyboard controls below. Use the <strong>...</strong> button to change editable shortcuts.</p>
+      <div class="keyboard-controls-summary" aria-label="Fixed keyboard controls">
+        <p><strong>Start a new game:</strong> Enter</p>
+        <p><strong>Move the cursor:</strong> Arrow keys</p>
+      </div>
+      <div class="keyboard-controls-panel" role="group" aria-label="Editable keyboard shortcuts">
+        <div class="keyboard-controls-header" aria-hidden="true">
+          <span>Action</span>
+          <span>Key</span>
+          <span>Change</span>
+        </div>
+        <div class="keyboard-control-row">
+          <span class="keyboard-control-label">Reveal selected cell</span>
+          <output class="shortcut-value" data-shortcut-value="REVEAL" aria-live="polite">F</output>
+          <button type="button" class="shortcut-change-button" data-edit-shortcut="REVEAL" aria-label="Change shortcut for reveal selected cell">...</button>
+        </div>
+        <div class="keyboard-control-row">
+          <span class="keyboard-control-label">Flag or unflag a mine</span>
+          <output class="shortcut-value" data-shortcut-value="FLAG" aria-live="polite">W</output>
+          <button type="button" class="shortcut-change-button" data-edit-shortcut="FLAG" aria-label="Change shortcut for flag or unflag a mine">...</button>
+        </div>
+        <div class="keyboard-control-row">
+          <span class="keyboard-control-label">Reveal surrounding cells</span>
+          <output class="shortcut-value" data-shortcut-value="REVEAL_AROUND" aria-live="polite">X</output>
+          <button type="button" class="shortcut-change-button" data-edit-shortcut="REVEAL_AROUND" aria-label="Change shortcut for reveal surrounding cells">...</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<dialog class="touch-controls-dialog controls-dialog" aria-labelledby="touch-controls-dialog-title" aria-describedby="touch-controls-dialog-description" aria-modal="true">
+  <div class="dialog-window-shell">
+    <div class="dialog-window-titlebar">
+      <h2 id="touch-controls-dialog-title">Touch Controls</h2>
+      <button type="button" class="close-touch-controls-button" aria-label="Close touch controls"></button>
+    </div>
+    <div class="dialog-window-body">
+      <p id="touch-controls-dialog-description">Touch gestures available on phones and tablets.</p>
+      <div class="touch-controls-list">
+        <div class="touch-control-row">
+          <strong>Tap</strong>
+          <span>Reveal a cell.</span>
+        </div>
+        <div class="touch-control-row">
+          <strong>Long-press</strong>
+          <span>Place or remove a flag.</span>
+        </div>
+        <div class="touch-control-row">
+          <strong>Double-tap</strong>
+          <span>Reveal surrounding cells for an already revealed cell.</span>
+        </div>
       </div>
     </div>
   </div>
