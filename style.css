@@ -701,8 +701,10 @@ main {
 .dialog-window-titlebar {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     min-height: 32px;
-    padding: 0 44px 0 10px;
+    gap: 12px;
+    padding: 3px 4px 3px 10px;
     color: #fff;
     background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
 }
@@ -712,6 +714,7 @@ main {
     font-size: 14px;
     font-weight: 700;
     line-height: 1.2;
+    flex: 1;
 }
 
 .dialog-window-body {
@@ -793,16 +796,42 @@ main {
     display: flex;
     align-items: center;
     gap: 8px;
+    line-height: 1.35;
 }
 
-.preferences-dialog .preferences-field {
-    align-items: flex-start;
+.preferences-dialog input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    margin: 1px 0 0;
+    flex: 0 0 auto;
+    border-top: 2px solid #808080;
+    border-left: 2px solid #808080;
+    border-right: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    background: #fff;
+    box-shadow: inset 1px 1px 0 #000;
+    position: relative;
 }
 
-.preference-announcement-level {
-    font: inherit;
-    padding: 6px 8px;
+.preferences-dialog input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 0;
+    width: 5px;
+    height: 10px;
+    border: solid #000;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
 }
+
+.preferences-dialog input[type="checkbox"]:focus-visible {
+    outline: 2px solid #005fcc;
+    outline-offset: 2px;
+}
+
 
 .main-button:focus-visible,
 .grid-item-highlight:focus-visible,
@@ -814,11 +843,11 @@ main {
 .preferences-button:focus-visible,
 .quick-access a:focus-visible,
 .instruction:focus-visible,
+.preferences-dialog input[type="checkbox"]:focus-visible,
 .close-instructions-button:focus-visible,
 .close-preferences-button:focus-visible,
 .close-results-button:focus-visible,
-.close-statistics-button:focus-visible,
-.preference-announcement-level:focus-visible {
+.close-statistics-button:focus-visible {
     outline: 2px solid #005fcc;
     outline-offset: 2px;
 }
@@ -835,6 +864,11 @@ main {
     .preferences-button {
         min-height: 48px;
         padding: 10px 16px;
+    }
+
+    .preferences-dialog input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
     }
 
     .instructions-button,
@@ -869,17 +903,16 @@ main {
     position: absolute;
     top: 16px;
     right: 16px;
-    width: 36px;
-    height: 36px;
+    width: 20px;
+    height: 20px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 0;
-    font-size: 26px;
     cursor: pointer;
     border: none;
     background-color: transparent;
-    background-image: url("assets/button_unpressed.svg");
+    background-image: url("assets/close_unpressed.svg");
     background-repeat: no-repeat;
     background-size: 100% 100%;
     line-height: 1;
@@ -887,11 +920,12 @@ main {
 
 .close-instructions-button,
 .close-preferences-button {
-    top: 6px;
-    right: 6px;
-    width: 24px;
-    height: 24px;
-    font-size: 18px;
+    position: static;
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
+    line-height: 1;
     z-index: 2;
 }
 
@@ -899,23 +933,28 @@ main {
 .close-preferences-button:active,
 .close-results-button:active,
 .close-statistics-button:active {
-    background-image: url("assets/button_pressed.svg");
+    background-image: url("assets/close_pressed.svg");
     transform: translate(1px, 1px);
 }
 
+
 .instruction {
-    width: var(--cell-size);
-    height: var(--cell-size);
-    display: inline-block;
+    min-width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
     background-image: url("assets/closed.svg");
     background-size: 100%;
     text-align: center;
     border: none;
-    padding: 0;
+    padding: 0 4px;
     background-color: transparent;
     color: #111;
     font: inherit;
+    font-weight: 700;
+    font-size: 16px;
 }
 
 .grid-item-highlight {
@@ -996,6 +1035,12 @@ main {
         padding: 16px;
     }
 
+    .instruction {
+        min-width: 34px;
+        height: 34px;
+        font-size: 17px;
+    }
+
     .statistics-cards {
         min-width: 0;
         grid-template-columns: 1fr;
@@ -1013,11 +1058,11 @@ main {
     .preferences-button:focus-visible,
     .quick-access a:focus-visible,
     .instruction:focus-visible,
+    .preferences-dialog input[type="checkbox"]:focus-visible,
     .close-instructions-button:focus-visible,
     .close-preferences-button:focus-visible,
     .close-results-button:focus-visible,
-.close-statistics-button:focus-visible,
-    .preference-announcement-level:focus-visible {
+.close-statistics-button:focus-visible {
         outline: 3px solid #000;
     }
 }

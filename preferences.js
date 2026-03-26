@@ -19,7 +19,7 @@ const PREFERENCE_UI = {
   DIALOG: '.preferences-dialog',
   CLOSE_BUTTON: '.close-preferences-button',
   HAPTICS_TOGGLE: '.preference-haptics-toggle',
-  ANNOUNCEMENT_LEVEL: '.preference-announcement-level',
+  VERBOSE_TOGGLE: '.preference-verbose-toggle',
 };
 
 let preferencesDialogReturnFocusElement = null;
@@ -111,14 +111,14 @@ function shouldAnnounce(messageType) {
 
 function syncPreferencesUi() {
   const hapticsToggle = document.querySelector(PREFERENCE_UI.HAPTICS_TOGGLE);
-  const announcementLevelSelect = document.querySelector(PREFERENCE_UI.ANNOUNCEMENT_LEVEL);
+  const verboseToggle = document.querySelector(PREFERENCE_UI.VERBOSE_TOGGLE);
 
   if (hapticsToggle) {
     hapticsToggle.checked = isHapticsEnabled();
   }
 
-  if (announcementLevelSelect) {
-    announcementLevelSelect.value = getAnnouncementLevel();
+  if (verboseToggle) {
+    verboseToggle.checked = getAnnouncementLevel() === ANNOUNCEMENT_LEVELS.VERBOSE;
   }
 }
 
@@ -161,7 +161,7 @@ function bindPreferencesUi() {
   const preferencesDialog = document.querySelector(PREFERENCE_UI.DIALOG);
   const closePreferencesButton = document.querySelector(PREFERENCE_UI.CLOSE_BUTTON);
   const hapticsToggle = document.querySelector(PREFERENCE_UI.HAPTICS_TOGGLE);
-  const announcementLevelSelect = document.querySelector(PREFERENCE_UI.ANNOUNCEMENT_LEVEL);
+  const verboseToggle = document.querySelector(PREFERENCE_UI.VERBOSE_TOGGLE);
 
   if (!preferencesButton || !preferencesDialog) {
     return;
@@ -186,11 +186,13 @@ function bindPreferencesUi() {
     }
   });
 
-  announcementLevelSelect?.addEventListener('change', (event) => {
-    setAnnouncementLevel(event.target.value);
+  verboseToggle?.addEventListener('change', (event) => {
+    const verboseEnabled = Boolean(event.target.checked);
+    const level = verboseEnabled ? ANNOUNCEMENT_LEVELS.VERBOSE : ANNOUNCEMENT_LEVELS.NORMAL;
+    setAnnouncementLevel(level);
 
     if (typeof announceStatus === 'function') {
-      announceStatus(`Announcement level set to ${event.target.value}.`);
+      announceStatus(`Announcement level set to ${level}.`);
     }
   });
 }
