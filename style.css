@@ -1072,10 +1072,26 @@ body::-webkit-scrollbar-corner,
     cursor: pointer;
     border: none;
     background-color: transparent;
-    background-image: url("assets/close_unpressed.svg");
+    background-image: url("assets/button_unpressed.svg");
     background-repeat: no-repeat;
+    background-position: center;
     background-size: 100% 100%;
     line-height: 1;
+}
+
+.close-keyboard-controls-button::before,
+.close-touch-controls-button::before,
+.close-preferences-button::before,
+.close-results-button::before,
+.close-statistics-button::before {
+    content: "×";
+    display: block;
+    color: #111;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    transform: translateY(-1px);
 }
 
 .close-keyboard-controls-button,
@@ -1095,8 +1111,16 @@ body::-webkit-scrollbar-corner,
 .close-preferences-button:active,
 .close-results-button:active,
 .close-statistics-button:active {
-    background-image: url("assets/close_pressed.svg");
+    background-image: url("assets/button_pressed.svg");
     transform: translate(1px, 1px);
+}
+
+.close-keyboard-controls-button:active::before,
+.close-touch-controls-button:active::before,
+.close-preferences-button:active::before,
+.close-results-button:active::before,
+.close-statistics-button:active::before {
+    transform: translate(1px, 0);
 }
 
 
